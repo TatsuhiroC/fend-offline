@@ -1,4 +1,5 @@
-const CACHE = 'fend-v2';
+const CACHE = 'fend-v3';
+const TIMEOUT = 3000;
 const ASSETS = [
 	'./',
 	'./index.html',
@@ -28,6 +29,20 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
 	e.respondWith(
-		caches.match(e.request).then(r => r || fetch(e.request))
+		caches.match(e.request).then(cached => {
+			if (cached) return cached;
+			return Promise.race([
+				fetch(e.request).then(resp => {
+					if (resp && resp.ok) {
+						const clone = resp.clone();
+						caches.open(CACHE).then(c => c.put(e.request, clone));
+					}
+					return resp;
+				}),
+				new Promise((_, reject) =>
+					setTimeout(() => reject(new Error('timeout')), TIMEOUT)
+				)
+			]).catch(() => new Response('', { status: 504, statusText: 'Gateway Timeout' }));
+		})
 	);
 });
