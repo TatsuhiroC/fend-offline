@@ -1,4 +1,4 @@
-const CACHE = 'fend-v5';
+const CACHE = 'fend-v6';
 const TIMEOUT = 3000;
 const ASSETS = [
 	'./',
