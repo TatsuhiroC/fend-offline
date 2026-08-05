@@ -11,9 +11,26 @@
 <link rel="apple-touch-icon" href="icon-192.png" />
 <title>fend</title>
 <link rel="stylesheet" href="assets/App-CtSXWVvZ.css" />
+<style>
+	footer {
+		max-width: 80ch;
+		margin: 0 auto;
+		padding: 1ch 3ch 3ch;
+		font-size: 0.85em;
+		opacity: 0.7;
+		border-top: 1px solid;
+	}
+	footer p {
+		margin: 0.3em 0;
+	}
+</style>
 </head>
 <body>
 <div id="root"></div>
+<footer>
+	<p>Built by <a href="https://github.com/TatsuhiroC">TatsuhiroC</a> · <a href="https://github.com/TatsuhiroC/fend-offline">fend-offline</a></p>
+	<p>Powered by <a href="https://github.com/printfn/fend">fend</a> — arbitrary-precision unit-aware calculator (MIT)</p>
+</footer>
 <script>
 if ('serviceWorker' in navigator) {
 	navigator.serviceWorker.register('sw.js');
