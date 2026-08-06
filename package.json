@@ -1,0 +1,14 @@
+{
+	"name": "fend-offline",
+	"version": "1.0.0",
+	"private": true,
+	"description": "fend offline calculator — Android APK build via Capacitor",
+	"scripts": {
+		"build:web": "mkdir -p www && cp index.html manifest.json sw.js icon-192.png icon-512.png www/ && cp -r assets www/"
+	},
+	"devDependencies": {
+		"@capacitor/android": "^8.5.0",
+		"@capacitor/cli": "^8.5.0",
+		"@capacitor/core": "^8.5.0"
+	}
+}
