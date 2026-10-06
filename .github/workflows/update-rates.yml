@@ -1,0 +1,56 @@
+name: Refresh exchange rates
+
+# Keeps exchange-rates.xml (the offline currency snapshot) fresh. Without this the
+# snapshot only moves when someone runs `npm run rates:update` by hand, and every
+# installed client keeps converting with whatever rates existed at build time.
+#
+# The commit also bumps nothing by hand: scripts/patch-sw.mjs derives the service-worker
+# cache name from the file contents, so a new snapshot invalidates the old cache on the
+# next visit automatically.
+
+on:
+  schedule:
+    # Mondays 04:23 UTC — off the hour to avoid the usual cron congestion.
+    - cron: '23 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Fetch the latest UN rates snapshot
+        run: npm run rates:update
+
+      - name: Commit and push when the snapshot changed
+        id: commit
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- exchange-rates.xml; then
+            echo "[rates] snapshot already current — nothing to do"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add exchange-rates.xml
+          git commit -m "Refresh exchange rates snapshot"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      # Pushes made with GITHUB_TOKEN deliberately do not trigger other workflows, so the
+      # Pages deploy has to be dispatched explicitly for the new snapshot to go live.
+      - name: Redeploy the PWA
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run "Deploy PWA to GitHub Pages" --ref main

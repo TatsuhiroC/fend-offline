@@ -36,6 +36,14 @@ jobs:
       - name: Generate Android project
         run: npx cap add android
 
+      # Replaces the Capacitor template icons and splash screen with fend branding.
+      # Sources live in resources/ (the tool defaults to assets/, which is the web bundle here).
+      - name: Generate app icons and splash screen
+        run: >-
+          npx @capacitor/assets generate --android --assetPath resources
+          --iconBackgroundColor '#1a1a2e' --iconBackgroundColorDark '#1a1a2e'
+          --splashBackgroundColor '#1a1a2e' --splashBackgroundColorDark '#1a1a2e'
+
       # Installs a stable release keystore (so APKs can be installed over each other)
       # and stamps versionCode/versionName. Falls back to a debug build, with a warning,
       # when the signing secrets are not configured.
@@ -77,7 +85,10 @@ jobs:
             fi
           fi
           if [ -n "${{ secrets.ANDROID_CERT_SHA256 }}" ]; then
-            grep -qi "${{ secrets.ANDROID_CERT_SHA256 }}" apk-certs.txt ||
+            # apksigner prints the digest without separators, so normalise whatever format
+            # the secret uses (the docs suggest colons) before comparing.
+            EXPECTED="$(printf '%s' "${{ secrets.ANDROID_CERT_SHA256 }}" | tr -d ':' | tr '[:upper:]' '[:lower:]')"
+            grep -qi "$EXPECTED" apk-certs.txt ||
               { echo "::error::APK certificate does not match ANDROID_CERT_SHA256"; exit 1; }
           fi
 

@@ -17,7 +17,6 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const TARGET = join(ROOT, 'exchange-rates.xml');
-const SW = join(ROOT, 'sw.js');
 const ENDPOINT = process.env.RATES_ENDPOINT || 'https://fend.pr.workers.dev/exchange-rates';
 const MIN_CURRENCIES = 50;
 
@@ -35,25 +34,9 @@ if (!xml.includes('<UN_OPERATIONAL_RATES>') || currencies.length < MIN_CURRENCIE
 	fail(`response does not look like the UN rates dataset (${currencies.length} currencies parsed)`);
 }
 
-const previous = existsSync(TARGET) ? readFileSync(TARGET, 'utf8') : '';
-const changed = previous !== xml;
-writeFileSync(TARGET, xml);
+// scripts/patch-sw.mjs derives the service-worker cache name from the built files, so a
+// refreshed snapshot reaches installed clients on their next visit without any bump here.
 console.log(
 	`[rates] exchange-rates.xml: ${currencies.length} currencies, ${Buffer.byteLength(xml)} bytes` +
 		(changed ? ' (updated)' : ' (unchanged)')
 );
-
-if (!changed) process.exit(0);
-
-// The service worker is cache-first, so returning visitors keep serving the snapshot
-// they already have until the cache name changes. Bump it here so a refreshed
-// snapshot actually reaches installed clients on their next visit.
-const sw = readFileSync(SW, 'utf8');
-const match = /const CACHE = 'fend-v(\d+)';/.exec(sw);
-if (!match) {
-	console.warn('[rates] could not find `const CACHE = \'fend-vN\';` in sw.js — bump it manually');
-	process.exit(0);
-}
-const next = Number(match[1]) + 1;
-writeFileSync(SW, sw.replace(match[0], `const CACHE = 'fend-v${next}';`));
-console.log(`[rates] sw.js cache bumped: fend-v${match[1]} -> fend-v${next}`);
