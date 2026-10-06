@@ -36,20 +36,66 @@ jobs:
       - name: Generate Android project
         run: npx cap add android
 
-      - name: Build debug APK
-        run: cd android && ./gradlew assembleDebug
+      # Installs a stable release keystore (so APKs can be installed over each other)
+      # and stamps versionCode/versionName. Falls back to a debug build, with a warning,
+      # when the signing secrets are not configured.
+      - name: Configure signing and version
+        id: signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: node scripts/prepare-android.mjs
+
+      - name: Build APK
+        run: |
+          set -euo pipefail
+          cd android
+          case "${{ steps.signing.outputs.mode }}" in
+            release) ./gradlew assembleRelease ;;
+            *)       ./gradlew assembleDebug ;;
+          esac
+
+      # A release APK that silently ends up unsigned would break every future upgrade,
+      # so fail loudly here instead of shipping it.
+      - name: Verify APK signature
+        run: |
+          set -euo pipefail
+          APK="${{ steps.signing.outputs.apk_path }}"
+          if [ ! -f "$APK" ]; then
+            echo "::error::$APK was not produced (an unsigned build lands in app-release-unsigned.apk — the signing config did not apply)"
+            ls -R android/app/build/outputs/apk || true
+            exit 1
+          fi
+          BUILD_TOOLS="$(ls -d "${ANDROID_HOME:-/usr/local/lib/android/sdk}"/build-tools/* | sort -V | tail -1)"
+          "$BUILD_TOOLS/apksigner" verify --print-certs "$APK" | tee apk-certs.txt
+          if [ "${{ steps.signing.outputs.mode }}" = "release" ]; then
+            if grep -q "^Signer #1 certificate DN: CN=Android Debug" apk-certs.txt; then
+              echo "::error::release APK is signed with a debug key — the signing config was not applied"
+              exit 1
+            fi
+          fi
+          if [ -n "${{ secrets.ANDROID_CERT_SHA256 }}" ]; then
+            grep -qi "${{ secrets.ANDROID_CERT_SHA256 }}" apk-certs.txt ||
+              { echo "::error::APK certificate does not match ANDROID_CERT_SHA256"; exit 1; }
+          fi
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v5
         with:
-          name: fend-offline-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: fend-offline-${{ steps.signing.outputs.mode }}-apk
+          path: ${{ steps.signing.outputs.apk_path }}
 
       - name: Attach APK to GitHub Release (tagged builds)
         if: startsWith(github.ref, 'refs/tags/')
         env:
           GH_TOKEN: ${{ github.token }}
+          APK: ${{ steps.signing.outputs.apk_path }}
+          VERSION: ${{ steps.signing.outputs.version_name }}
         run: |
-          gh release create "$GITHUB_REF_NAME" android/app/build/outputs/apk/debug/app-debug.apk \
+          ASSET="fend-offline-${VERSION:-$GITHUB_REF_NAME}.apk"
+          cp "$APK" "$ASSET"
+          gh release create "$GITHUB_REF_NAME" "$ASSET" \
             --title "$GITHUB_REF_NAME" --generate-notes \
-            || gh release upload "$GITHUB_REF_NAME" android/app/build/outputs/apk/debug/app-debug.apk --clobber
+            || gh release upload "$GITHUB_REF_NAME" "$ASSET" --clobber

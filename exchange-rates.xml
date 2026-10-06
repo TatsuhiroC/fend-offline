@@ -1,0 +1,1581 @@
+<UN_OPERATIONAL_RATES_DATASET>
+ <xs:schema id="UN_OPERATIONAL_RATES_DATASET" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xs:element name="UN_OPERATIONAL_RATES_DATASET" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+   <xs:complexType>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+     <xs:element name="UN_OPERATIONAL_RATES">
+      <xs:complexType>
+       <xs:sequence>
+         <xs:element name="abbrv_name" type="xs:string" minOccurs="0" /> 
+         <xs:element name="name" type="xs:string" minOccurs="0" /> 
+         <xs:element name="f_curr_code" type="xs:string" minOccurs="0" /> 
+         <xs:element name="eff_date" type="xs:dateTime" minOccurs="0" /> 
+         <xs:element name="rate" type="xs:double" minOccurs="0" /> 
+       </xs:sequence>
+      </xs:complexType>
+     </xs:element>
+    </xs:choice>
+   </xs:complexType>
+  </xs:element>
+ </xs:schema>\r\n	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Afghanistan</abbrv_name>
+		<name>Afghanistan Afghani</name>
+		<f_curr_code>AFN</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>64.883</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Albania</abbrv_name>
+		<name>Albania Lek(e)</name>
+		<f_curr_code>ALL</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>80.79</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Algeria</abbrv_name>
+		<name>Algerian Dinar</name>
+		<f_curr_code>DZD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>133.358</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>American Samoa</abbrv_name>
+		<name>US Dollar</name>
+		<f_curr_code>USD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Andorra</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Angola</abbrv_name>
+		<name>Angolan Kwanza</name>
+		<f_curr_code>AOA</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>913</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Anguilla</abbrv_name>
+		<name>E.C. Dollar</name>
+		<f_curr_code>XCD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2.7</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Antigua and Barbuda</abbrv_name>
+		<name>E.C. Dollar</name>
+		<f_curr_code>XCD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2.7</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Argentina</abbrv_name>
+		<name>Argentine Peso</name>
+		<f_curr_code>ARS</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1524</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Armenia</abbrv_name>
+		<name>Armenian Dram</name>
+		<f_curr_code>AMD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>362</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Aruba</abbrv_name>
+		<name>Aruban Guilder</name>
+		<f_curr_code>AWG</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.79</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Australia</abbrv_name>
+		<name>Australian Dollar</name>
+		<f_curr_code>AUD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.432</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Austria</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Azerbaijan</abbrv_name>
+		<name>Azerbaijan Manat</name>
+		<f_curr_code>AZN</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.698</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Bahamas</abbrv_name>
+		<name>Bahamian Dollar</name>
+		<f_curr_code>BSD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Bahrain</abbrv_name>
+		<name>Bahraini Dinar</name>
+		<f_curr_code>BHD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.377</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Bangladesh</abbrv_name>
+		<name>Bangladesh Taka</name>
+		<f_curr_code>BDT</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>122.465</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Barbados</abbrv_name>
+		<name>Barbados Dollar</name>
+		<f_curr_code>BBD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Belarus</abbrv_name>
+		<name>Belarusian Ruble</name>
+		<f_curr_code>BYN</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>3.015</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Belgium</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Belize</abbrv_name>
+		<name>Belize Dollar</name>
+		<f_curr_code>BZD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Benin</abbrv_name>
+		<name>CFA Franc</name>
+		<f_curr_code>XOF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>578.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Bermuda</abbrv_name>
+		<name>Bermuda Dollar</name>
+		<f_curr_code>BMD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Bhutan</abbrv_name>
+		<name>Bhutan Ngultrum</name>
+		<f_curr_code>BTN</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>95.983</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Bolivia</abbrv_name>
+		<name>Bolivia Boliviano</name>
+		<f_curr_code>BOB</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>12.02</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Bosnia and Herzegovina</abbrv_name>
+		<name>Bosnia and Herzegovina Convertible Mark</name>
+		<f_curr_code>BAM</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.725</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Botswana</abbrv_name>
+		<name>Botswana Pula</name>
+		<f_curr_code>BWP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>13.532</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Brazil</abbrv_name>
+		<name>Brazilian Real</name>
+		<f_curr_code>BRL</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>5.217</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Brunei</abbrv_name>
+		<name>Brunei Dollar</name>
+		<f_curr_code>BND</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.279</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Bulgaria</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Burkina Faso</abbrv_name>
+		<name>CFA Franc</name>
+		<f_curr_code>XOF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>578.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Burundi</abbrv_name>
+		<name>Burundi Franc</name>
+		<f_curr_code>BIF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2978</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Cambodia</abbrv_name>
+		<name>Cambodian Riel</name>
+		<f_curr_code>KHR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>4048.5</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Cameroon</abbrv_name>
+		<name>CFA Franc</name>
+		<f_curr_code>XAF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>578.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Canada</abbrv_name>
+		<name>Canadian Dollar</name>
+		<f_curr_code>CAD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.418</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Canary Islands</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Cape Verde</abbrv_name>
+		<name>Cape Verde Escudo</name>
+		<f_curr_code>CVE</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>97.227</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Cayman Islands</abbrv_name>
+		<name>Cayman Is. Dollar</name>
+		<f_curr_code>KYD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.82</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Central African Republic</abbrv_name>
+		<name>CFA Franc</name>
+		<f_curr_code>XAF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>578.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Chad</abbrv_name>
+		<name>CFA Franc</name>
+		<f_curr_code>XAF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>578.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Chile</abbrv_name>
+		<name>Chilean Peso</name>
+		<f_curr_code>CLP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>970.7</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>China</abbrv_name>
+		<name>Chinese Renminbi</name>
+		<f_curr_code>CNY</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>6.704</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Colombia</abbrv_name>
+		<name>Colombian Peso</name>
+		<f_curr_code>COP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>3355.5</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Comoros</abbrv_name>
+		<name>Comoros Franc</name>
+		<f_curr_code>KMF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>433.796</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Congo</abbrv_name>
+		<name>CFA Franc</name>
+		<f_curr_code>XAF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>578.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Congo, Dem. Rep.</abbrv_name>
+		<name>Congo Franc, Dem. Rep.of</name>
+		<f_curr_code>CDF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2308.695</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Cook Islands</abbrv_name>
+		<name>New Zealand Dollar</name>
+		<f_curr_code>NZD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.772</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Costa Rica</abbrv_name>
+		<name>Costa Rica Colon</name>
+		<f_curr_code>CRC</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>451.6</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Cote d'Ivoire</abbrv_name>
+		<name>CFA Franc</name>
+		<f_curr_code>XOF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>578.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Croatia</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Cuba</abbrv_name>
+		<name>Cuban Peso</name>
+		<f_curr_code>CUP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>24</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Curacao</abbrv_name>
+		<name>Caribbean Guilder</name>
+		<f_curr_code>XCG</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.79</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Cyprus</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Czech Republic</abbrv_name>
+		<name>Czech Koruna</name>
+		<f_curr_code>CZK</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>21.532</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Denmark</abbrv_name>
+		<name>Danish Krone</name>
+		<f_curr_code>DKK</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>6.591</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Djibouti</abbrv_name>
+		<name>Djibouti Francs</name>
+		<f_curr_code>DJF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>177</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Dominica</abbrv_name>
+		<name>E.C. Dollar</name>
+		<f_curr_code>XCD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2.7</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Dominican Republic</abbrv_name>
+		<name>Dominican Peso</name>
+		<f_curr_code>DOP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>59.154</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>East Timor</abbrv_name>
+		<name>US Dollar</name>
+		<f_curr_code>USD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Ecuador</abbrv_name>
+		<name>US Dollar</name>
+		<f_curr_code>USD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Egypt</abbrv_name>
+		<name>Egyptian Pound</name>
+		<f_curr_code>EGP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>52.07</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>El Salvador</abbrv_name>
+		<name>US Dollar</name>
+		<f_curr_code>USD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Equatorial Guinea</abbrv_name>
+		<name>CFA Franc</name>
+		<f_curr_code>XAF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>578.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Eritrea</abbrv_name>
+		<name>Eritrea Nakfa</name>
+		<f_curr_code>ERN</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>15</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Estonia</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Eswatini, Kingdom of</abbrv_name>
+		<name>Lilangeni</name>
+		<f_curr_code>SZL</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>16.445</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Ethiopia</abbrv_name>
+		<name>Ethiopian Birr</name>
+		<f_curr_code>ETB</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>160.88</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Fiji</abbrv_name>
+		<name>Fiji Dollar</name>
+		<f_curr_code>FJD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2.21</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Finland</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>France</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>French Guiana</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>French Polynesia</abbrv_name>
+		<name>CFP Franc</name>
+		<f_curr_code>XPF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>105.222</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Gabon</abbrv_name>
+		<name>CFA Franc</name>
+		<f_curr_code>XAF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>578.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Gambia</abbrv_name>
+		<name>Gambian Dalasi</name>
+		<f_curr_code>GMD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>73.408</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Georgia</abbrv_name>
+		<name>Georgian Lari</name>
+		<f_curr_code>GEL</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2.58</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Germany</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Ghana</abbrv_name>
+		<name>Ghana Cedi</name>
+		<f_curr_code>GHS</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>11.65</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Gibraltar</abbrv_name>
+		<name>Gibraltar Pound</name>
+		<f_curr_code>GIP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.756</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Greece</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Greenland</abbrv_name>
+		<name>Danish Krone</name>
+		<f_curr_code>DKK</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>6.591</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Grenada</abbrv_name>
+		<name>E.C. Dollar</name>
+		<f_curr_code>XCD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2.7</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Guadeloupe</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Guam</abbrv_name>
+		<name>US Dollar</name>
+		<f_curr_code>USD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Guatemala</abbrv_name>
+		<name>Guatemala Quetzal(es)</name>
+		<f_curr_code>GTQ</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>7.632</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Guinea</abbrv_name>
+		<name>Guinean Franc</name>
+		<f_curr_code>GNF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>8765.54</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Guinea-Bissau</abbrv_name>
+		<name>CFA Franc</name>
+		<f_curr_code>XOF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>578.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Guyana</abbrv_name>
+		<name>Guyana Dollar</name>
+		<f_curr_code>GYD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>208.2</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Haiti</abbrv_name>
+		<name>Haiti Gourde</name>
+		<f_curr_code>HTG</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>130.46</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Honduras</abbrv_name>
+		<name>Honduras Lempira</name>
+		<f_curr_code>HNL</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>26.854</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Hong Kong</abbrv_name>
+		<name>HongKong Dollar</name>
+		<f_curr_code>HKD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>7.846</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Hungary</abbrv_name>
+		<name>Hungary Forint</name>
+		<f_curr_code>HUF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>323.36</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Iceland</abbrv_name>
+		<name>Iceland Krona</name>
+		<f_curr_code>ISK</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>120.53</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>India</abbrv_name>
+		<name>Indian Rupee</name>
+		<f_curr_code>INR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>95.983</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Indonesia</abbrv_name>
+		<name>Indonesia Rupiah</name>
+		<f_curr_code>IDR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>17965</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Iran</abbrv_name>
+		<name>Iranian Rial</name>
+		<f_curr_code>IRR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1684168.704</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Iraq</abbrv_name>
+		<name>Iraqi Dinar</name>
+		<f_curr_code>IQD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1310</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Ireland</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Israel</abbrv_name>
+		<name>Israel Shekel</name>
+		<f_curr_code>ILS</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>3.066</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Italy</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Jamaica</abbrv_name>
+		<name>Jamaican Dollar</name>
+		<f_curr_code>JMD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>158.31</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Japan</abbrv_name>
+		<name>Japanese Yen</name>
+		<f_curr_code>JPY</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>157.48</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Jordan</abbrv_name>
+		<name>Jordanian Dinar</name>
+		<f_curr_code>JOD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.708</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Kazakhstan</abbrv_name>
+		<name>Kazakhstan Tenge</name>
+		<f_curr_code>KZT</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>438.6</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Kenya</abbrv_name>
+		<name>Kenyan Shilling</name>
+		<f_curr_code>KES</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>129.6</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Kiribati</abbrv_name>
+		<name>Australian Dollar</name>
+		<f_curr_code>AUD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.432</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Korea, D.P.R. of</abbrv_name>
+		<name>Korean Won, North Korea</name>
+		<f_curr_code>KPW</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>110</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Korea, Republic of</abbrv_name>
+		<name>Korean Won, South Korea</name>
+		<f_curr_code>KRW</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1355.7</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Kuwait</abbrv_name>
+		<name>Kuwaiti Dinar</name>
+		<f_curr_code>KWD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.305</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Kyrgyzstan</abbrv_name>
+		<name>Kyrgyzstan Som</name>
+		<f_curr_code>KGS</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>87.476</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Lao, People's Dem. Rep.</abbrv_name>
+		<name>Laos Kip</name>
+		<f_curr_code>LAK</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>22339</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Latvia</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Lebanon</abbrv_name>
+		<name>Lebanese Pound</name>
+		<f_curr_code>LBP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>89500</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Lesotho</abbrv_name>
+		<name>Lesotho Loti</name>
+		<f_curr_code>LSL</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>16.445</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Liberia</abbrv_name>
+		<name>Liberian Dollar</name>
+		<f_curr_code>LRD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>180.757</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Libyan Arab Jamahiriya</abbrv_name>
+		<name>Libyan Dinar</name>
+		<f_curr_code>LYD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>6.371</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Liechtenstein</abbrv_name>
+		<name>Swiss Franc</name>
+		<f_curr_code>CHF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.834</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Lithuania</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Luxembourg</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Macao</abbrv_name>
+		<name>Macao Pataca</name>
+		<f_curr_code>MOP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>8.081</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Madagascar</abbrv_name>
+		<name>Malagasy Ariary, Madagascar</name>
+		<f_curr_code>MGA</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>4370.62</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Malawi</abbrv_name>
+		<name>Malawi Kwacha</name>
+		<f_curr_code>MWK</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1724</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Malaysia</abbrv_name>
+		<name>Malaysia Ringgit</name>
+		<f_curr_code>MYR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>4.08</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Maldives</abbrv_name>
+		<name>Maldives Rufiyaa</name>
+		<f_curr_code>MVR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>15</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Mali</abbrv_name>
+		<name>CFA Franc</name>
+		<f_curr_code>XOF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>578.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Malta</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Marshall Islands</abbrv_name>
+		<name>US Dollar</name>
+		<f_curr_code>USD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Martinique</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Mauritania</abbrv_name>
+		<name>Mauritania Ouguiya</name>
+		<f_curr_code>MRU</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>39.854</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Mauritius</abbrv_name>
+		<name>Mauritius Rupee</name>
+		<f_curr_code>MUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>47.459</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Mexico</abbrv_name>
+		<name>Mexican Peso</name>
+		<f_curr_code>MXN</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>17.986</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Micronesia</abbrv_name>
+		<name>US Dollar</name>
+		<f_curr_code>USD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Moldova, Republic of</abbrv_name>
+		<name>Moldovan Leu</name>
+		<f_curr_code>MDL</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>17.6</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Monaco</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Mongolia</abbrv_name>
+		<name>Mongolia Tugrik</name>
+		<f_curr_code>MNT</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>3588</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Montenegro</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Montserrat</abbrv_name>
+		<name>E.C. Dollar</name>
+		<f_curr_code>XCD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2.7</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Morocco</abbrv_name>
+		<name>Morocco Dirham</name>
+		<f_curr_code>MAD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>9.668</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Mozambique</abbrv_name>
+		<name>Mozambique Metical</name>
+		<f_curr_code>MZN</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>63.605</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Myanmar</abbrv_name>
+		<name>Myanmar Kyat</name>
+		<f_curr_code>MMK</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>4185</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Namibia</abbrv_name>
+		<name>Namibia Dollar</name>
+		<f_curr_code>NAD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>16.445</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Nauru</abbrv_name>
+		<name>Australian Dollar</name>
+		<f_curr_code>AUD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.432</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Nepal</abbrv_name>
+		<name>Nepalese Rupee</name>
+		<f_curr_code>NPR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>153.481</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Netherlands</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>New Caledonia</abbrv_name>
+		<name>CFP Franc</name>
+		<f_curr_code>XPF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>105.222</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>New Zealand</abbrv_name>
+		<name>New Zealand Dollar</name>
+		<f_curr_code>NZD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.772</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Nicaragua</abbrv_name>
+		<name>Nicaragua Cordoba Oro</name>
+		<f_curr_code>NIO</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>36.351</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Niger</abbrv_name>
+		<name>CFA Franc</name>
+		<f_curr_code>XOF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>578.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Nigeria</abbrv_name>
+		<name>Nigeria Naira</name>
+		<f_curr_code>NGN</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1329.98</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Niue</abbrv_name>
+		<name>New Zealand Dollar</name>
+		<f_curr_code>NZD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.772</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>North Macedonia, Rep. of</abbrv_name>
+		<name>Denar</name>
+		<f_curr_code>MKD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>54.185</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Northern Mariana Islands</abbrv_name>
+		<name>US Dollar</name>
+		<f_curr_code>USD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Norway</abbrv_name>
+		<name>Norwegian Krone</name>
+		<f_curr_code>NOK</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>9.595</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Oman</abbrv_name>
+		<name>Oman Rial</name>
+		<f_curr_code>OMR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.384</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Pakistan</abbrv_name>
+		<name>Pakistani Rupee</name>
+		<f_curr_code>PKR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>277</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Palau, Republic of</abbrv_name>
+		<name>US Dollar</name>
+		<f_curr_code>USD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Panama</abbrv_name>
+		<name>Panama Balboa</name>
+		<f_curr_code>PAB</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Papua New Guinea</abbrv_name>
+		<name>Kina</name>
+		<f_curr_code>PGK</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>4.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Paraguay</abbrv_name>
+		<name>Paraguay Guarani</name>
+		<f_curr_code>PYG</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>5840</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Peru</abbrv_name>
+		<name>Sol</name>
+		<f_curr_code>PEN</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>3.439</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Philippines</abbrv_name>
+		<name>Philippine Peso</name>
+		<f_curr_code>PHP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>62.558</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Poland</abbrv_name>
+		<name>Poland Zloty</name>
+		<f_curr_code>PLN</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>3.853</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Portugal</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Puerto Rico</abbrv_name>
+		<name>US Dollar</name>
+		<f_curr_code>USD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Qatar</abbrv_name>
+		<name>Qatari Rial</name>
+		<f_curr_code>QAR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>3.64</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Reunion</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Romania</abbrv_name>
+		<name>Romanian Leu</name>
+		<f_curr_code>RON</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>4.653</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Russian Federation</abbrv_name>
+		<name>Russian Rouble</name>
+		<f_curr_code>RUB</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>83.762</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Rwanda</abbrv_name>
+		<name>Rwanda Franc</name>
+		<f_curr_code>RWF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1467.378</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Saint Helena</abbrv_name>
+		<name>St.Helena Pound</name>
+		<f_curr_code>SHP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.756</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Saint Kitts and Nevis</abbrv_name>
+		<name>E.C. Dollar</name>
+		<f_curr_code>XCD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2.7</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Saint Lucia</abbrv_name>
+		<name>E.C. Dollar</name>
+		<f_curr_code>XCD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2.7</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Samoa</abbrv_name>
+		<name>Samoa Tala</name>
+		<f_curr_code>WST</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2.694</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>San Marino</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Sao Tome and Principe</abbrv_name>
+		<name>Sao Tome Principe Dobra</name>
+		<f_curr_code>STN</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>21.384</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Saudi Arabia</abbrv_name>
+		<name>Saudi Riyal</name>
+		<f_curr_code>SAR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>3.755</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Senegal</abbrv_name>
+		<name>CFA Franc</name>
+		<f_curr_code>XOF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>578.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Serbia</abbrv_name>
+		<name>Serbian Dinar</name>
+		<f_curr_code>RSD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>103.525</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Seychelles</abbrv_name>
+		<name>Seychelles Rupee</name>
+		<f_curr_code>SCR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>13.956</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Sierra Leone</abbrv_name>
+		<name>Sierra Leone Leone</name>
+		<f_curr_code>SLE</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>24.11</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Singapore</abbrv_name>
+		<name>Singapore Dollar</name>
+		<f_curr_code>SGD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.279</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Sint Maarten</abbrv_name>
+		<name>Caribbean Guilder</name>
+		<f_curr_code>XCG</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.79</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Slovakia</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Slovenia</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Solomon Islands</abbrv_name>
+		<name>Solomon Is. Dollar</name>
+		<f_curr_code>SBD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>7.937</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Somalia</abbrv_name>
+		<name>Somali Shilling</name>
+		<f_curr_code>SOS</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>24300</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>South Africa</abbrv_name>
+		<name>South Africa Rand</name>
+		<f_curr_code>ZAR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>16.445</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>South Sudan</abbrv_name>
+		<name>South Sudanese Pound</name>
+		<f_curr_code>SSP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>5755.32</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Spain</abbrv_name>
+		<name>Euro</name>
+		<f_curr_code>EUR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.882</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Sri Lanka</abbrv_name>
+		<name>Sri Lanka Rupee</name>
+		<f_curr_code>LKR</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>330.79</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>St. Vincent and the Grena</abbrv_name>
+		<name>E.C. Dollar</name>
+		<f_curr_code>XCD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2.7</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Sudan</abbrv_name>
+		<name>Sudanese Pound</name>
+		<f_curr_code>SDG</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>7000</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Suriname</abbrv_name>
+		<name>Surinamese Dollar</name>
+		<f_curr_code>SRD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>37.468</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Sweden</abbrv_name>
+		<name>Swedish Krona</name>
+		<f_curr_code>SEK</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>9.993</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Switzerland</abbrv_name>
+		<name>Swiss Franc</name>
+		<f_curr_code>CHF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.834</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Syrian Arab Republic</abbrv_name>
+		<name>Syrian Pound</name>
+		<f_curr_code>SYP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>122</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Tajikistan</abbrv_name>
+		<name>Tajikistan Somoni</name>
+		<f_curr_code>TJS</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>9.187</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Tanzania, United Rep. of</abbrv_name>
+		<name>Tanzania Shilling</name>
+		<f_curr_code>TZS</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2626.57</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Thailand</abbrv_name>
+		<name>Thai Baht</name>
+		<f_curr_code>THB</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>33.58</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Togo</abbrv_name>
+		<name>CFA Franc</name>
+		<f_curr_code>XOF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>578.394</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Tokelau Islands</abbrv_name>
+		<name>New Zealand Dollar</name>
+		<f_curr_code>NZD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.772</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Tonga</abbrv_name>
+		<name>Tonga Pa'anga</name>
+		<f_curr_code>TOP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2.306</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Trinidad and Tobago</abbrv_name>
+		<name>Trinidad and Tobago Dollar</name>
+		<f_curr_code>TTD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>6.754</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Tunisia</abbrv_name>
+		<name>Tunisian Dinar</name>
+		<f_curr_code>TND</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>2.958</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Turkey</abbrv_name>
+		<name>Turkish Lira</name>
+		<f_curr_code>TRY</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>48.999</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Turkmenistan</abbrv_name>
+		<name>Turkmenistan Manat</name>
+		<f_curr_code>TMT</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>3.5</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Turks and Caicos Island</abbrv_name>
+		<name>US Dollar</name>
+		<f_curr_code>USD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Tuvalu</abbrv_name>
+		<name>Australian Dollar</name>
+		<f_curr_code>AUD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1.432</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Uganda</abbrv_name>
+		<name>Uganda Shilling</name>
+		<f_curr_code>UGX</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>3913.75</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Ukraine</abbrv_name>
+		<name>Ukraine Hryvnia</name>
+		<f_curr_code>UAH</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>44.72</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>United Arab Emirates</abbrv_name>
+		<name>United Arab Emirates Dirham</name>
+		<f_curr_code>AED</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>3.673</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>United Kingdom</abbrv_name>
+		<name>U.K. Pound</name>
+		<f_curr_code>GBP</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>0.756</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>United States of America</abbrv_name>
+		<name>US Dollar</name>
+		<f_curr_code>USD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Uruguay</abbrv_name>
+		<name>Uruguay Peso</name>
+		<f_curr_code>UYU</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>40.24</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Uzbekistan</abbrv_name>
+		<name>Uzbekistan Sum</name>
+		<f_curr_code>UZS</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>11791</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Vanuatu</abbrv_name>
+		<name>Vanuatu Vatu</name>
+		<f_curr_code>VUV</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>115.68</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Venezuela</abbrv_name>
+		<name>Bolivar Digital</name>
+		<f_curr_code>VES</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>852.417</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Viet Nam</abbrv_name>
+		<name>Viet Nam Dong</name>
+		<f_curr_code>VND</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>25969</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Virgin Islands (UK)</abbrv_name>
+		<name>US Dollar</name>
+		<f_curr_code>USD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Virgin Islands (USA)</abbrv_name>
+		<name>US Dollar</name>
+		<f_curr_code>USD</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>1</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Wallis and Futuna Islands</abbrv_name>
+		<name>CFP Franc</name>
+		<f_curr_code>XPF</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>105.222</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Yemen, Republic of</abbrv_name>
+		<name>Yemeni Rial</name>
+		<f_curr_code>YER</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>527</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Zambia</abbrv_name>
+		<name>Zambia Kwacha</name>
+		<f_curr_code>ZMW</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>19.5</rate>
+	</UN_OPERATIONAL_RATES>
+	<UN_OPERATIONAL_RATES>
+		<abbrv_name>Zimbabwe</abbrv_name>
+		<name>Zimbabwe Gold</name>
+		<f_curr_code>ZWG</f_curr_code>
+		<eff_date>01 Oct 2026</eff_date>
+		<rate>25.874</rate>
+	</UN_OPERATIONAL_RATES>
+</UN_OPERATIONAL_RATES_DATASET>

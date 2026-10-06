@@ -1,4 +1,4 @@
-const CACHE = 'fend-v6';
+const CACHE = 'fend-v7';
 const TIMEOUT = 3000;
 const ASSETS = [
 	'./',
@@ -6,6 +6,7 @@ const ASSETS = [
 	'./manifest.json',
 	'./icon-192.png',
 	'./icon-512.png',
+	'./exchange-rates.xml',
 	'./assets/App-BkQrMm5v.js',
 	'./assets/App-CtSXWVvZ.css',
 	'./assets/main-BGizNAwM.js',
