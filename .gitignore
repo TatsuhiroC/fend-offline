@@ -3,3 +3,9 @@ www/
 android/
 *.apk
 .DS_Store
+
+# Android signing material — only ever passed to CI through repository secrets
+keystore.properties
+*.keystore
+*.jks
+apk-certs.txt

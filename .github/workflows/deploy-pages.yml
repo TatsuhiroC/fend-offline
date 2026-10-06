@@ -1,0 +1,54 @@
+name: Deploy PWA to GitHub Pages
+
+# Replaces the legacy "Deploy from a branch" (Jekyll) pipeline, whose last two builds
+# failed with "Page build failed." Publishing the built www/ directory through
+# actions/deploy-pages is deterministic and needs no Jekyll at all.
+#
+# One-time setup: Settings -> Pages -> Build and deployment -> Source: GitHub Actions.
+#   gh api -X PUT repos/TatsuhiroC/fend-offline/pages -f build_type=workflow
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'manifest.json'
+      - 'sw.js'
+      - 'icon-*.png'
+      - 'assets/**'
+      - 'exchange-rates.xml'
+      - 'scripts/**'
+      - 'package.json'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build static site
+        run: npm run build:web
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: www
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5
