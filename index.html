@@ -35,8 +35,11 @@
 <div id="root"></div>
 <script>
 window.addEventListener('fend-rates', ({ detail }) => {
-	const labels = { online: 'Online rates', saved: 'Offline fallback · saved rates', bundled: 'Offline fallback · built-in rates' };
-	document.getElementById('rates-status').textContent = `${labels[detail.source]} · ${detail.date}`;
+	const labels = { online: 'Online rates', saved: 'Local fallback · saved rates', bundled: 'Local fallback · built-in rates' };
+	const update = detail.refreshing ? ' · Updating online rates…' :
+		detail.failure === 'timeout' ? ' · Online update timed out' :
+		detail.failure ? ' · Online update unavailable' : '';
+	document.getElementById('rates-status').textContent = `${labels[detail.source]} · ${detail.date}${update}`;
 });
 const nativeApp = Boolean(window.Capacitor?.isNativePlatform?.());
 if (nativeApp && 'serviceWorker' in navigator) {

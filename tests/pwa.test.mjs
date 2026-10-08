@@ -77,7 +77,7 @@ test('online rates take priority, refresh on each request, and persist for offli
 	assert.equal(context.exchangeRatesSource, 'online');
 	fixture = onlineFixture(context, 7.5);
 	assert.equal((await context.refreshExchangeRates()).get('CNY'), 7.5);
-	assert.equal(calls, 2);
+	assert.equal(calls, 4, 'each refresh races both mirrors');
 	const restored = ratesContext({ localStorage: context.localStorage });
 	assert.equal((await restored.getExchangeRates()).get('CNY'), 7.5);
 	await restored.refreshExchangeRates();
@@ -153,7 +153,7 @@ test('temperature and arithmetic never wait for rates; currency submission refre
 	assert.equal((await context.fend('87 fahrenheit to celsius', 1000, '')).result, 'approx. 30.5555555556 celsius');
 	assert.equal((await context.fend('1 + 1', 1000, '')).result, '2');
 	assert.equal((await context.fend('100 USD to CNY', 100, '', false)).result, `${100 * context.bundledExchangeRates.get('CNY')} CNY`);
-	assert(Date.now() - started < 1000, 'temperature, arithmetic and hints must not wait for the 3-second rates timeout');
+	assert(Date.now() - started < 1000, 'temperature, arithmetic and hints must not wait for the rates timeout');
 	const submitted = context.fend('100 USD to CNY', 1000, '');
 	finishFetch({ ok: true, text: async () => JSON.stringify(onlineFixture(context, 7.25)) });
 	await pending;
@@ -273,4 +273,65 @@ globalThis.fetch = async () => new Response(await readFile(new URL('./incoming.x
 		assert.match(run(), /\(updated\)/);
 		assert.equal(await readFile(join(dir, 'exchange-rates.xml'), 'utf8'), next);
 	} finally { await rm(dir, { recursive: true, force: true }); }
+});
+
+test('a healthy 6-second response survives when the other mirror returns 403', async () => {
+ const context = ratesContext();
+ await context.refreshExchangeRates();
+ const urls = [];
+ let finishPrimary;
+ context.fetch = (url, options) => {
+  urls.push(url);
+  if (url.includes('jsdelivr')) return new Promise(resolve => { finishPrimary = resolve; });
+  return Promise.resolve({ ok: false, status: 403 });
+ };
+ const pending = context.refreshExchangeRates();
+ assert.equal(urls.length, 2, 'both mirrors must start before either responds');
+ assert.equal(context.currencyRefreshing, true);
+ assert.equal(context.currencyFetchTimeout, 15000);
+ await new Promise(resolve => setTimeout(resolve, 6100));
+ assert.equal(context.currencyRefreshing, true, 'do not abort a usable connection at 1.5 or 3 seconds');
+ const fixture = onlineFixture(context);
+ fixture.usd.sgd = 1.28041753;
+ finishPrimary({ ok: true, text: async () => JSON.stringify(fixture) });
+ const result = await pending;
+ assert.equal(result.get('SGD'), 1.28041753);
+ assert.equal(context.exchangeRatesSource, 'online');
+ assert.equal(context.currencyRefreshing, false);
+ assert.equal(context.currencyFailure, '');
+});
+
+test('timeouts abort all mirrors, identify local fallback and allow a fresh request', async () => {
+ const signals = [];
+ const context = ratesContext({ setTimeout: fn => setTimeout(fn, 20) });
+ await context.refreshExchangeRates();
+ context.fetch = (_, options) => { signals.push(options.signal); return new Promise(() => {}); };
+ const result = await context.refreshExchangeRates();
+ assert.equal(result.get('SGD'), 1.279);
+ assert.equal(signals.length, 2);
+ assert(signals.every(signal => signal.aborted));
+ assert.equal(context.currencyFailure, 'timeout');
+ assert.equal(context.currencyRefreshing, false);
+ context.fetch = async () => ({ ok: true, text: async () => JSON.stringify(onlineFixture(context)) });
+ await context.refreshExchangeRates();
+ assert.equal(context.exchangeRatesSource, 'online');
+ assert.equal(context.currencyFailure, '');
+});
+
+test('a winning mirror aborts the loser, whose later response cannot change saved data', async () => {
+ const context = ratesContext();
+ await context.refreshExchangeRates();
+ const signals = [];
+ let finishLoser;
+ context.fetch = (url, options) => {
+  signals.push(options.signal);
+  if (url.includes('jsdelivr')) return new Promise(resolve => { finishLoser = resolve; });
+  return Promise.resolve({ ok: true, text: async () => JSON.stringify(onlineFixture(context, 7.5)) });
+ };
+ assert.equal((await context.refreshExchangeRates()).get('CNY'), 7.5);
+ assert(signals.every(signal => signal.aborted));
+ finishLoser({ ok: true, text: async () => JSON.stringify(onlineFixture(context, 99)) });
+ await new Promise(resolve => setImmediate(resolve));
+ assert.equal((await context.getExchangeRates()).get('CNY'), 7.5);
+ assert.equal(context.exchangeRatesSource, 'online');
 });
