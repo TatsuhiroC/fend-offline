@@ -99,16 +99,24 @@ test('bundled rates and real WASM calculate offline', async () => {
 		const workerName = (await readdir(assets)).find(name => /^worker-.*\.js$/.test(name));
 		await import(pathToFileURL(join(process.cwd(), assets, workerName)));
 		assert.equal(messages.pop(), 'ready');
-		for (const [input, expected] of [
-			['87 fahrenheit to celsius', 'approx. 30.5555555556 celsius'],
-			['87 °F to °C', 'approx. 30.5555555556 °C'],
-			['100 USD to CNY', `${100 * rates.get('CNY')} CNY`],
-			['100 CNY to USD', /^approx\. .* USD$/],
-			['1 + 1', '2']
+		for (const [input, expected, currency] of [
+			['87 fahrenheit to celsius', 'approx. 30.5555555556 celsius', false],
+			['87 °F to °C', 'approx. 30.5555555556 °C', false],
+			['1 cup to ml', '236.5882365 ml', false],
+			['10 pounds to kg', '4.5359237 kg', false],
+			['10 lb to pounds', '10 pounds', false],
+			['1 CUP to USD', /^approx\. .* USD$/, true],
+			['1 Cup to USD', /^approx\. .* USD$/, true],
+			['10 GBP to USD', /^approx\. .* USD$/, true],
+			['100 dollars to euros', `${100 * rates.get('EUR')} euros`, true],
+			['100 USD to CNY', `${100 * rates.get('CNY')} CNY`, true],
+			['100 CNY to USD', /^approx\. .* USD$/, true],
+			['1 + 1', '2', false]
 		]) {
 			messageHandler({ data: { input, timeout: 1000, variables: '', currencyData: rates } });
 			const result = messages.pop();
 			assert.equal(result.ok, true, input);
+			assert.equal(rateContext.usesCurrency(input, result), currency, input);
 			if (expected instanceof RegExp) assert.match(result.result, expected);
 			else assert.equal(result.result, expected, input);
 		}
