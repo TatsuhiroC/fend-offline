@@ -70,6 +70,37 @@ test('an older currency submission cannot replace a newer result after rates arr
  assert.equal((await older).message, 'cancelled');
 });
 
+test('superseded currency requests do not block hints or clear a newer submission state', async () => {
+ let finishRates, finishWorker;
+ const data = new Map([['USD', 1], ['CNY', 7]]);
+ class Worker {
+  constructor() { queueMicrotask(() => this.onmessage({ data: 'ready' })); }
+  terminate() {}
+  postMessage(args) {
+   const done = () => this.onmessage({ data: { ok: true, result: args.input } });
+   if (args.input === 'slow calculation') finishWorker = done;
+   else queueMicrotask(done);
+  }
+ }
+ const context = runtime(Worker, { getExchangeRates: async () => data,
+  usesCurrency: input => input.includes('USD'),
+  refreshExchangeRates: () => new Promise(resolve => { finishRates = resolve; }) });
+ const older = context.fend('100 USD to CNY', 1000, '');
+ await new Promise(resolve => setImmediate(resolve));
+ await context.fend('1 + 1', 1000, '');
+ assert.equal((await context.fend('2 + 2', 100, '', false)).result, '2 + 2');
+ const current = context.fend('slow calculation', 1000, '');
+ await new Promise(resolve => setImmediate(resolve));
+ finishRates(data);
+ assert.equal((await older).message, 'cancelled');
+ assert.equal((await context.fend('hint', 100, '', false)).message, 'cancelled');
+ finishWorker();
+ assert.equal((await current).result, 'slow calculation');
+ assert.equal(context.submittedQueries, 0);
+ context.cancelCalculations();
+ assert.equal(context.submittedQueries, 0);
+});
+
 test('corrupted, unexpected and blocked history storage cannot crash startup', () => {
  const history = app.match(/var initialHistory = \(\(\) => \{[\s\S]*?\}\)\(\);/)[0];
  for (const value of ['{bad', 'null', '{}', '[null,42,"1+1"]', JSON.stringify(Array(120).fill('2+2'))]) {
@@ -111,7 +142,7 @@ async function serviceWorker(overrides = {}) {
  const handlers = {};
  const context = vm.createContext({ URL, AbortController, setTimeout, clearTimeout, Response, console: silent,
   self: { location: { origin: 'https://example.test' }, registration: { scope: 'https://example.test/fend/' },
-   addEventListener: (name, fn) => { handlers[name] = fn; }, clients: { claim: async () => {} } }, ...overrides });
+   addEventListener: (name, fn) => { handlers[name] = fn; }, clients: { claim: async () => {}, matchAll: async () => [] } }, ...overrides });
  vm.runInContext(await readFile('www/sw.js', 'utf8'), context);
  return handlers;
 }
@@ -141,6 +172,71 @@ test('cache cleanup preserves other apps on the same origin', async () => {
  handlers.activate({ waitUntil: promise => { pending = promise; } });
  await pending;
  assert.deepEqual([...keys], ['fend:https://example.test/other/:old', 'fend-legacy-other', 'unrelated']);
+});
+
+test('PWA retains active older graphs, serves their exact assets and retires them after upgrade', async () => {
+ const scope = 'https://example.test/fend/';
+ const oldKey = `fend:${scope}:old`;
+ const otherKey = 'fend:https://example.test/other/:old';
+ const keys = new Set([oldKey, otherKey]);
+ const oldWorker = scope + 'assets/0000000000000000/worker-old.js';
+ let oldReads = 0;
+ const main = { id: 'new', type: 'window', url: scope + 'index.html', postMessage() {} };
+ const sibling = { id: 'old', type: 'window', url: scope + 'index.html', postMessage() {} };
+ let windows = [main, sibling];
+ const handlersRef = {};
+ const active = {};
+ const registration = { scope, active, waiting: null, installing: null };
+ await serviceWorker({ self: {
+  location: { origin: 'https://example.test' }, registration,
+  addEventListener: (name, fn) => { handlersRef[name] = fn; },
+  clients: { claim: async () => {}, matchAll: async () => windows }
+ }, caches: {
+  keys: async () => [...keys], delete: async key => keys.delete(key),
+  open: async key => ({ keys: async () => [{ url: key === oldKey ? oldWorker : 'https://example.test/other/index.html' }],
+   match: async request => {
+    if (key !== oldKey) return undefined;
+    oldReads++;
+    return new Response(request.url === oldWorker ? 'old worker' : 'old HTML');
+   }
+  })
+ }, fetch: async () => new Response('new network HTML') });
+ // The overridden self installs listeners into this map.
+ const dispatch = async (name, event = {}) => {
+  let pending;
+  handlersRef[name]({ ...event, waitUntil: promise => { pending = promise; } });
+  await pending;
+ };
+ await dispatch('activate');
+ assert(keys.has(oldKey), 'an unknown legacy window must keep its graph');
+ await dispatch('message', { source: main, data: { type: 'FEND_CLIENT_VERSION', version } });
+ await dispatch('message', { source: sibling, data: { type: 'FEND_CLIENT_VERSION', version: '0000000000000000' } });
+ assert(keys.has(oldKey));
+ let response;
+ handlersRef.fetch({ request: { method: 'GET', url: oldWorker, mode: 'cors' }, respondWith: promise => { response = promise; } });
+ assert.equal(await (await response).text(), 'old worker');
+ const reads = oldReads;
+ handlersRef.fetch({ request: { method: 'GET', url: scope + 'missing.html', mode: 'navigate' }, respondWith: promise => { response = promise; } });
+ assert.equal(await (await response).text(), 'new network HTML');
+ assert.equal(oldReads, reads, 'old HTML must never satisfy a new navigation');
+ windows = [main];
+ const futureKey = `fend:${scope}:pending-update`;
+ keys.add(futureKey);
+ for (const phase of ['installing', 'waiting']) {
+  registration[phase] = {};
+  await dispatch('message', { source: main, data: { type: 'FEND_CLIENT_VERSION', version } });
+  assert(keys.has(futureKey), phase + ' cache must survive client reports');
+  assert(keys.has(oldKey));
+  registration[phase] = null;
+ }
+ registration.active = {};
+ await dispatch('message', { source: main, data: { type: 'FEND_CLIENT_VERSION', version } });
+ assert(keys.has(futureKey), 'a superseded worker must not delete its successor cache');
+ registration.active = active;
+ keys.delete(futureKey);
+ await dispatch('message', { source: main, data: { type: 'FEND_CLIENT_VERSION', version } });
+ assert(!keys.has(oldKey));
+ assert(keys.has(otherKey));
 });
 
 test('snapshot validation rejects malformed dates, truncated XML and oversized data', async () => {

@@ -56,15 +56,24 @@ if (nativeApp && 'serviceWorker' in navigator) {
 	})().catch(console.warn);
 }
 if ('serviceWorker' in navigator && !nativeApp) {
+	const reportVersion = worker => {
+		const version = document.querySelector('script[type="module"][src]')?.src.match(/\/assets\/([a-f0-9]{16})\//)?.[1];
+		if (version) worker?.postMessage({ type: 'FEND_CLIENT_VERSION', version });
+	};
+	navigator.serviceWorker.addEventListener('message', event => {
+		if (event.data?.type === 'FEND_REPORT_VERSION') reportVersion(event.source);
+	});
 	let updating = false;
 	let controlled = Boolean(navigator.serviceWorker.controller);
 	let offerUpdate = () => {};
 	navigator.serviceWorker.addEventListener('controllerchange', () => {
+		reportVersion(navigator.serviceWorker.controller);
 		if (updating) location.reload();
 		else if (controlled) offerUpdate(true);
 		controlled = true;
 	});
 	navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(registration => {
+		navigator.serviceWorker.ready.then(() => reportVersion(navigator.serviceWorker.controller)).catch(console.warn);
 		offerUpdate = (activated = false) => {
 			if ((!activated && !registration.waiting) || !navigator.serviceWorker.controller || document.getElementById('app-update')) return;
 			const button = document.createElement('button');
@@ -83,7 +92,10 @@ if ('serviceWorker' in navigator && !nativeApp) {
 		});
 		offerUpdate();
 		const check = () => {
-			if (document.visibilityState === 'visible') registration.update().catch(console.warn);
+			if (document.visibilityState === 'visible') {
+				reportVersion(navigator.serviceWorker.controller);
+				registration.update().catch(console.warn);
+			}
 		};
 		document.addEventListener('visibilitychange', check);
 		check();

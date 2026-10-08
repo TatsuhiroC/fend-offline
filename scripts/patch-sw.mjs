@@ -5,7 +5,7 @@
 // from upstream (new hashes) would break `caches.addAll()`. Deriving both the list
 // and the cache name from www/ prevents a stale hardcoded precache list,
 // and because every shipped file feeds the hash, any content change (including a refreshed
-// exchange-rates.xml) automatically invalidates the old cache. No manual `fend-vN` bumps.
+// embedded exchange rates) automatically versions the cache. No manual `fend-vN` bumps.
 //
 // Runs on the build output (www/), never on the repo root.
 //
