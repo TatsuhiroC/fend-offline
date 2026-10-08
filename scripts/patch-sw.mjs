@@ -2,9 +2,8 @@
 // Regenerate the service-worker asset list and cache name from the *built* output.
 //
 // Why: sw.js used to hardcode the hashed asset filenames, so re-syncing the frontend
-// from upstream (new hashes) would break `caches.addAll()` — the install step rejected
-// as a whole, the old worker stayed active and installed clients never received the
-// update. Deriving both the list and the cache name from www/ removes that failure mode,
+// from upstream (new hashes) would break `caches.addAll()`. Deriving both the list
+// and the cache name from www/ prevents a stale hardcoded precache list,
 // and because every shipped file feeds the hash, any content change (including a refreshed
 // exchange-rates.xml) automatically invalidates the old cache. No manual `fend-vN` bumps.
 //
@@ -36,6 +35,8 @@ const files = walk(dist)
 	.sort();
 
 const hash = createHash('sha256');
+// Worker-only fixes also require their own cache.
+hash.update(readFileSync(swPath));
 for (const file of files) {
 	hash.update(relative(dist, file).split(sep).join('/'));
 	hash.update(readFileSync(file));

@@ -33,7 +33,34 @@
 <div id="root"></div>
 <script>
 if ('serviceWorker' in navigator) {
-	navigator.serviceWorker.register('sw.js');
+	let updating = false;
+	navigator.serviceWorker.addEventListener('controllerchange', () => {
+		if (updating) location.reload();
+	});
+	navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(registration => {
+		const offerUpdate = () => {
+			if (!registration.waiting || !navigator.serviceWorker.controller || document.getElementById('app-update')) return;
+			const button = document.createElement('button');
+			button.id = 'app-update';
+			button.textContent = 'Update available — tap to reload';
+			button.onclick = () => {
+				if (!registration.waiting) { location.reload(); return; }
+				updating = true;
+				button.disabled = true;
+				registration.waiting.postMessage('SKIP_WAITING');
+			};
+			document.querySelector('header').append(button);
+		};
+		registration.addEventListener('updatefound', () => {
+			registration.installing?.addEventListener('statechange', offerUpdate);
+		});
+		offerUpdate();
+		const check = () => {
+			if (document.visibilityState === 'visible') registration.update().catch(console.warn);
+		};
+		document.addEventListener('visibilitychange', check);
+		check();
+	}).catch(console.warn);
 }
 </script>
 <script type="module" src="assets/main-BGizNAwM.js"></script>
