@@ -9,8 +9,14 @@ const dist = process.argv[2] ?? 'www';
 const assets = join(dist, 'assets');
 const hash = createHash('sha256');
 for (const file of readdirSync(assets).sort()) {
+	const path = join(assets, file);
+	// Upstream maps are not included, and would no longer match our patched code.
+	// Remove their dangling references before deriving the published asset version.
+	if (file.endsWith('.js')) {
+		writeFileSync(path, readFileSync(path, 'utf8').replace(/^\/\/[#@] sourceMappingURL=.*(?:\r?\n|$)/gm, ''));
+	}
 	hash.update(file);
-	hash.update(readFileSync(join(assets, file)));
+	hash.update(readFileSync(path));
 }
 const version = hash.digest('hex').slice(0, 16);
 const temporary = join(dist, 'versioned-assets');

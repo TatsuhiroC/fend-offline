@@ -51,8 +51,8 @@ jobs:
           --splashBackgroundColor '#1a1a2e' --splashBackgroundColorDark '#1a1a2e'
 
       # Installs a stable release keystore (so APKs can be installed over each other)
-      # and stamps versionCode/versionName. Falls back to a debug build, with a warning,
-      # when the signing secrets are not configured.
+      # and stamps versionCode/versionName. Branch builds without secrets use debug
+      # signing; tagged releases fail if any required signing secret is missing.
       - name: Configure signing and version
         id: signing
         env:

@@ -1,12 +1,12 @@
 name: Refresh exchange rates
 
 # Keeps exchange-rates.xml (the offline currency snapshot) fresh. Without this the
-# snapshot only moves when someone runs `npm run rates:update` by hand, and every
-# installed client keeps converting with whatever rates existed at build time.
+# snapshot only moves when someone runs `npm run rates:update` by hand. Online
+# calculations prefer live downloads; this snapshot is the final offline fallback.
 #
 # The commit also bumps nothing by hand: scripts/patch-sw.mjs derives the service-worker
-# cache name from the file contents, so a new snapshot invalidates the old cache on the
-# next visit automatically.
+# cache name from the built files, including the embedded rates. The Pages redeploy
+# below publishes the new backup; an installed APK needs a rebuilt package to get it.
 
 on:
   schedule:
