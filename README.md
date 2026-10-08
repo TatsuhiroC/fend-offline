@@ -10,7 +10,7 @@ An offline-capable web app for [fend](https://github.com/printfn/fend), an arbit
 
 - **Arbitrary precision** — `pi * 10^50` gives you 50 digits, no sweat
 - **Unit conversion** — `100 kg to lbs`, `5'10" to cm`, `1 lightyear to parsecs`
-- **Currency** — a bundled exchange-rate snapshot (151 distinct currencies), works offline too
+- **Currency** — latest online rates first, saved rates when offline, bundled snapshot as a final fallback
 - **Number bases** — `0xff to decimal`, `0b1001 + 3`
 - **Complex numbers** — `cos(pi/4) + i * sin(pi/4)`
 - **Trigonometry, logarithms, algebra** — and more
@@ -19,7 +19,7 @@ An offline-capable web app for [fend](https://github.com/printfn/fend), an arbit
 
 - **高精度计算** — `pi * 10^50` 直接给出 50 位
 - **单位换算** — `100 kg to lbs`、`5'10" to cm`、`1 lightyear to parsecs`
-- **汇率** — 内置汇率快照（151 种不同货币），完全离线可用
+- **汇率** — 优先读取最新在线汇率，断网时使用已保存的数据，最后以内置快照兜底
 - **进制转换** — `0xff to decimal`、`0b1001 + 3`
 - **复数** — `cos(pi/4) + i * sin(pi/4)`
 - **三角函数、对数、代数** 等等
@@ -76,39 +76,39 @@ APK 使用保存在 GitHub Secrets 里的 keystore 签名，因此新版本可�
 
 The core [fend](https://github.com/printfn/fend) library is written in Rust and compiled to WebAssembly. This repo packages the pre-built WASM + a minimal React UI into a static site with a [Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) for offline caching. The Android APK is built automatically by [GitHub Actions](.github/workflows/build-apk.yml) using [Capacitor](https://capacitorjs.com).
 
-The build embeds the exchange-rate snapshot from `exchange-rates.xml` directly into the app bundle. Currency and temperature calculations therefore do not wait for a network request. Run `npm run rates:update` to refresh the snapshot; new rates reach installed clients with the next app update.
+Web and PWA use the same network-first currency logic. A submitted currency calculation requests the latest USD-based data from [Currency API](https://github.com/fawazahmed0/exchange-api), using its jsDelivr endpoint and Cloudflare mirror. The complete request has a 3-second deadline. Valid responses are saved in browser storage; failed, slow or invalid responses use the last saved rates, or the bundled UN snapshot if no download has succeeded. The page shows the data date and whether online or fallback rates are in use. Currency API publishes daily data, not tick-by-tick trading quotes. Temperature, arithmetic and typing hints never wait for the rates request. Run `npm run rates:update` to refresh the built-in backup snapshot.
 
 ### Development / 开发
 
 ```sh
 npm install                 # Capacitor toolchain (only needed for the APK)
 npm run build:web           # builds versioned assets with bundled rates in www/
-npm run test:web            # checks offline calculations and worker recovery
+npm run test:web            # checks network/fallback rates, calculations and worker recovery
 npm run rates:update        # refresh exchange-rates.xml (+ bumps the SW cache)
 npm run android:keystore    # generate the release keystore and print the CI secrets
 npx cap add android && cd android && ./gradlew assembleDebug   # local APK
 ```
 
-The UI/WASM assets in `assets/` are the upstream [fend web build](https://github.com/printfn/fend) (`wasm/` + `web/`). Build scripts patch only `www/`, embed rates, handle worker startup failures, and give each asset graph a content-derived URL. The service worker activates only after all offline resources download successfully. Updates wait until existing windows close, or until you tap the update button, so an active calculation keeps using one version. After re-syncing upstream, run `npm run test:web`; the build fails if a patch no longer matches. GitHub Pages is published from `www/` by [deploy-pages.yml](.github/workflows/deploy-pages.yml), which requires **Settings → Pages → Source: GitHub Actions**.
+The UI/WASM assets in `assets/` are the upstream [fend web build](https://github.com/printfn/fend) (`wasm/` + `web/`). Build scripts patch only `www/`, add network-first rates with an embedded backup, handle worker startup failures, and give each asset graph a content-derived URL. The service worker activates only after all offline resources download successfully. Updates wait until existing windows close, or until you tap the update button, so an active calculation keeps using one version. After re-syncing upstream, run `npm run test:web`; the build fails if a patch no longer matches. GitHub Pages is published from `www/` by [deploy-pages.yml](.github/workflows/deploy-pages.yml), which requires **Settings → Pages → Source: GitHub Actions**.
 
 ---
 
 核心 [fend](https://github.com/printfn/fend) 库用 Rust 编写，编译为 WebAssembly。本仓库将预构建的 WASM 和一个轻量 React UI 打包为静态网站，通过 Service Worker 实现离线缓存。安卓 APK 由 [GitHub Actions](.github/workflows/build-apk.yml) 通过 [Capacitor](https://capacitorjs.com) 自动构建。
 
-构建时把 `exchange-rates.xml` 中的汇率快照直接嵌入程序，因此货币和温度计算都不需要等待网络请求。运行 `npm run rates:update` 刷新快照；已安装的 PWA 在下次程序更新时取得新汇率。
+普通网页和 PWA 使用同一套在线优先的汇率逻辑。提交货币计算时从 [Currency API](https://github.com/fawazahmed0/exchange-api) 读取最新的美元基准汇率，提供 jsDelivr 和 Cloudflare 两个入口，整个请求最多等待 3 秒。有效数据会保存在浏览器本地；断网、超时或返回无效数据时使用最近保存的汇率，没有保存记录才使用内置的联合国汇率快照。页面显示数据日期及在线／本地来源。这个在线源每日更新，不是秒级交易报价。温度、算术和输入提示不等待汇率请求。`npm run rates:update` 用于刷新内置备用快照。
 
 ### 开发
 
 ```sh
 npm install                 # Capacitor 工具链（仅构建 APK 时需要）
 npm run build:web           # 在 www/ 构建带版本地址和内置汇率的程序
-npm run test:web            # 验证离线计算和引擎故障恢复
+npm run test:web            # 验证在线／本地汇率、计算和引擎故障恢复
 npm run rates:update        # 刷新 exchange-rates.xml（并自动 bump SW 缓存版本）
 npm run android:keystore    # 生成签名用 keystore 并打印 CI secrets
 npx cap add android && cd android && ./gradlew assembleDebug   # 本地构建 APK
 ```
 
-`assets/` 里的 UI/WASM 来自上游 [fend 的 web 构建](https://github.com/printfn/fend)（`wasm/` + `web/` 目录）。构建脚本只修改 `www/`：嵌入汇率、处理引擎启动失败，并为整组资源生成与内容对应的版本地址。只有完整下载全部离线资源，Service Worker 才会安装成功。更新会等已有窗口关闭，或用户点击更新按钮后生效，避免计算中途混用版本。同步上游后请运行 `npm run test:web`；补丁匹配失败会直接中止构建。GitHub Pages 由 [deploy-pages.yml](.github/workflows/deploy-pages.yml) 发布 `www/`，需要先在 **Settings → Pages → Source** 选择 **GitHub Actions**。
+`assets/` 里的 UI/WASM 来自上游 [fend 的 web 构建](https://github.com/printfn/fend)（`wasm/` + `web/` 目录）。构建脚本只修改 `www/`：加入在线优先和内置备用汇率、处理引擎启动失败，并为整组资源生成与内容对应的版本地址。只有完整下载全部离线资源，Service Worker 才会安装成功。更新会等已有窗口关闭，或用户点击更新按钮后生效，避免计算中途混用版本。同步上游后请运行 `npm run test:web`；补丁匹配失败会直接中止构建。GitHub Pages 由 [deploy-pages.yml](.github/workflows/deploy-pages.yml) 发布 `www/`，需要先在 **Settings → Pages → Source** 选择 **GitHub Actions**。
 
 ## Credits / 致谢
 

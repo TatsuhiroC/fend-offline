@@ -24,14 +24,20 @@
 	header p {
 		margin: 0;
 	}
+	#rates-status { margin-top: 0.5em; }
 </style>
 </head>
 <body>
 <header>
 	<p>by <a href="https://github.com/TatsuhiroC">TatsuhiroC</a> · <a href="https://github.com/TatsuhiroC/fend-offline">fend-offline</a> · engine <a href="https://github.com/printfn/fend">fend</a> (MIT)</p>
+	<p id="rates-status" role="status"></p>
 </header>
 <div id="root"></div>
 <script>
+window.addEventListener('fend-rates', ({ detail }) => {
+	const labels = { online: 'Online rates', saved: 'Offline fallback · saved rates', bundled: 'Offline fallback · built-in rates' };
+	document.getElementById('rates-status').textContent = `${labels[detail.source]} · ${detail.date}`;
+});
 if ('serviceWorker' in navigator) {
 	let updating = false;
 	navigator.serviceWorker.addEventListener('controllerchange', () => {
