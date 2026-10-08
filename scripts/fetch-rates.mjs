@@ -11,35 +11,50 @@
 // Usage: node scripts/fetch-rates.mjs
 //        npm run rates:update
 
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, renameSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseSnapshot } from './snapshot-data.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const TARGET = join(ROOT, 'exchange-rates.xml');
 const ENDPOINT = process.env.RATES_ENDPOINT || 'https://fend.pr.workers.dev/exchange-rates';
-const MIN_CURRENCIES = 50;
 
 function fail(message) {
 	console.error(`[rates] ${message}`);
 	process.exit(1);
 }
 
-const res = await fetch(ENDPOINT, { headers: { accept: 'text/xml,text/plain,*/*' } });
+const res = await fetch(ENDPOINT, { signal: AbortSignal.timeout(15000), headers: { accept: 'text/xml,text/plain,*/*' } });
 if (!res.ok) fail(`${ENDPOINT} responded ${res.status} ${res.statusText}`);
-const xml = await res.text();
+const limit = 512 * 1024;
+if (Number(res.headers.get('content-length')) > limit) fail('Snapshot response exceeds 512 KiB');
+const chunks = [];
+let bytes = 0;
+const reader = res.body.getReader();
+try {
+	while (true) {
+		const { done, value } = await reader.read();
+		if (done) break;
+		bytes += value.byteLength;
+		if (bytes > limit) throw new Error('Snapshot response exceeds 512 KiB');
+		chunks.push(Buffer.from(value));
+	}
+} finally { await reader.cancel().catch(() => {}); }
+const xml = Buffer.concat(chunks).toString('utf8');
 
-const currencies = [...xml.matchAll(/<f_curr_code>([A-Z]{3})<\/f_curr_code>/g)].map(m => m[1]);
-if (!xml.includes('<UN_OPERATIONAL_RATES>') || currencies.length < MIN_CURRENCIES) {
-	fail(`response does not look like the UN rates dataset (${currencies.length} currencies parsed)`);
-}
+const { rates } = parseSnapshot(xml);
 
 const changed = !existsSync(TARGET) || readFileSync(TARGET, 'utf8') !== xml;
-if (changed) writeFileSync(TARGET, xml);
+if (changed) {
+	const temporary = TARGET + '.tmp';
+	writeFileSync(temporary, xml);
+	renameSync(temporary, TARGET);
+}
 
 // scripts/patch-sw.mjs derives the service-worker cache name from the built files, so a
 // refreshed snapshot reaches installed clients on their next visit without any bump here.
 console.log(
-	`[rates] exchange-rates.xml: ${currencies.length} currencies, ${Buffer.byteLength(xml)} bytes` +
+	`[rates] exchange-rates.xml: ${rates.size} distinct currencies, ${Buffer.byteLength(xml)} bytes` +
 		(changed ? ' (updated)' : ' (unchanged)')
 );

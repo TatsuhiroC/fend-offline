@@ -33,7 +33,7 @@ test('a legacy APK worker upgrades immediately, unregisters itself and reloads p
 	const handlers = {};
 	const keys = new Set(['fend-old', 'unrelated']);
 	let skipped = 0, unregistered = 0, opened = 0, navigated = 0;
-	const context = vm.createContext({ console, self: {
+	const context = vm.createContext({ console, URL, self: {
 		location: { origin: 'https://localhost' },
 		addEventListener: (event, handler) => { handlers[event] = handler; },
 		skipWaiting: async () => skipped++,
@@ -63,7 +63,8 @@ test('branch and release APKs share increasing codes above the legacy installed 
 			await writeFile(join(dir, 'app/build.gradle'), 'android { defaultConfig { versionCode 1 } }\n');
 			execFileSync(process.execPath, ['scripts/prepare-android.mjs', dir], { env: {
 				...process.env, GITHUB_REF_TYPE: type, GITHUB_REF_NAME: name, GITHUB_RUN_NUMBER: String(run),
-				GITHUB_OUTPUT: '', GITHUB_STEP_SUMMARY: '', ANDROID_KEYSTORE_BASE64: ''
+				GITHUB_OUTPUT: '', GITHUB_STEP_SUMMARY: '', ANDROID_KEYSTORE_BASE64: Buffer.alloc(128).toString('base64'),
+				ANDROID_KEYSTORE_PASSWORD: 'test-pass', ANDROID_KEY_ALIAS: 'test-key', ANDROID_KEY_PASSWORD: 'test-pass'
 			}, stdio: 'pipe' });
 			const gradle = await readFile(join(dir, 'app/build.gradle'), 'utf8');
 			codes.push(Number(gradle.match(/versionCode (\d+)/g).at(-1).match(/\d+/)[0]));

@@ -7,6 +7,7 @@ var currencyRateEndpoints = [
 	'https://latest.currency-api.pages.dev/v1/currencies/usd.min.json'
 ];
 var currencyFetchTimeout = 3000;
+var currencyResponseLimit = 128 * 1024;
 var currencyRequest;
 var exchangeRateCache = bundledExchangeRates;
 var exchangeRatesDate = bundledRatesDate;
@@ -52,6 +53,28 @@ notifyExchangeRates();
 
 async function getExchangeRates() { return exchangeRateCache; }
 
+async function readCurrencyResponse(response) {
+	if (Number(response.headers?.get('content-length')) > currencyResponseLimit) throw new Error('Oversized exchange rates');
+	if (!response.body?.getReader) {
+		const text = await response.text();
+		if (text.length > currencyResponseLimit) throw new Error('Oversized exchange rates');
+		return JSON.parse(text);
+	}
+	const reader = response.body.getReader();
+	const decoder = new TextDecoder();
+	let length = 0, text = '';
+	try {
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			length += value.byteLength;
+			if (length > currencyResponseLimit) throw new Error('Oversized exchange rates');
+			text += decoder.decode(value, { stream: true });
+		}
+		return JSON.parse(text + decoder.decode());
+	} finally { void reader.cancel().catch(() => {}); }
+}
+
 function usesCurrency(input, result) {
 	const text = input + ' ' + (result.ok ? result.result : result.message);
 	const codes = text.match(/\b[A-Za-z]{3}\b/g) || [];
@@ -68,17 +91,30 @@ async function refreshExchangeRates() {
 			// Race the entire operation, including JSON parsing, against one deadline.
 			// A stalled first mirror cannot prevent local fallback or a later retry.
 			const download = (async () => {
-				for (const endpoint of currencyRateEndpoints) {
+				const started = Date.now();
+				for (const [index, endpoint] of currencyRateEndpoints.entries()) {
+					const endpointController = new AbortController();
+					const abort = () => endpointController.abort();
+					controller.signal.addEventListener('abort', abort, { once: true });
+					const budget = Math.max(1, (currencyFetchTimeout - (Date.now() - started)) / (currencyRateEndpoints.length - index));
+					let endpointTimer;
 					try {
-						const response = await fetch(endpoint, { cache: 'no-store', signal: controller.signal });
-						if (!response.ok) throw new Error('Exchange-rate HTTP ' + response.status);
-						const data = await response.json();
+						const data = await Promise.race([(async () => {
+							const response = await fetch(endpoint, { cache: 'no-store', signal: endpointController.signal });
+							if (!response.ok) throw new Error('Exchange-rate HTTP ' + response.status);
+							return await readCurrencyResponse(response);
+						})(), new Promise((_, reject) => {
+							endpointTimer = setTimeout(() => { endpointController.abort(); reject(new Error('Mirror timeout')); }, budget);
+						})]);
 						const map = parseOnlineRates(data);
-						if (data.date < exchangeRatesDate.slice(0, 10)) throw new Error('Exchange rates are older than saved data');
+						if (exchangeRatesSource !== 'bundled' && data.date < exchangeRatesDate) throw new Error('Exchange rates are older than saved data');
 						if (controller.signal.aborted) throw new Error('Exchange-rate timeout');
 						return { data, map };
 					} catch (error) {
 						if (controller.signal.aborted) throw error;
+					} finally {
+						clearTimeout(endpointTimer);
+						controller.signal.removeEventListener('abort', abort);
 					}
 				}
 				throw new Error('Exchange-rate services unavailable');

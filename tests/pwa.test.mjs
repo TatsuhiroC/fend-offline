@@ -16,7 +16,7 @@ const rateRegion = app.match(/\/\/#region src\/lib\/exchange-rates\.ts\n([\s\S]*
 
 function ratesContext(options = {}) {
 	const saved = new Map();
-	const context = vm.createContext({ AbortController, setTimeout, clearTimeout,
+	const context = vm.createContext({ AbortController, TextDecoder, setTimeout, clearTimeout,
 		fetch: async () => { throw new Error('offline'); },
 		localStorage: { getItem: key => saved.get(key) ?? null, setItem: (key, value) => saved.set(key, value) },
 		...options });
@@ -71,7 +71,7 @@ test('online rates take priority, refresh on each request, and persist for offli
 	context.fetch = async (_, options) => {
 		assert.equal(options.cache, 'no-store');
 		calls++;
-		return { ok: true, json: async () => fixture };
+		return { ok: true, text: async () => JSON.stringify(fixture) };
 	};
 	assert.equal((await context.refreshExchangeRates()).get('CNY'), 7.25);
 	assert.equal(context.exchangeRatesSource, 'online');
@@ -92,17 +92,17 @@ test('broken primary mirror uses secondary; invalid responses keep last good rat
 	context.fetch = async url => {
 		urls.push(url);
 		if (url.includes('jsdelivr')) throw new Error('primary unavailable');
-		return { ok: true, json: async () => fixture };
+		return { ok: true, text: async () => JSON.stringify(fixture) };
 	};
 	assert.equal((await context.refreshExchangeRates()).get('CNY'), 7.25);
 	assert.equal(urls.length, 2);
 	for (const bad of [{}, { ...fixture, usd: { USD: 1 } }, { ...fixture, usd: { ...fixture.usd, cny: -1 } }, { ...fixture, date: '2026-02-30' }]) {
-		context.fetch = async () => ({ ok: true, json: async () => bad });
+		context.fetch = async () => ({ ok: true, text: async () => JSON.stringify(bad) });
 		assert.equal((await context.refreshExchangeRates()).get('CNY'), 7.25);
 		assert.equal(context.exchangeRatesSource, 'saved');
 	}
 	const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-	context.fetch = async () => ({ ok: true, json: async () => ({ ...fixture, date: yesterday, usd: { ...fixture.usd, cny: 6 } }) });
+	context.fetch = async () => ({ ok: true, text: async () => JSON.stringify({ ...fixture, date: yesterday, usd: { ...fixture.usd, cny: 6 } }) });
 	assert.equal((await context.refreshExchangeRates()).get('CNY'), 7.25, 'an old mirror must not overwrite newer saved rates');
 });
 
@@ -116,11 +116,11 @@ test('slow requests fall back within deadline, share in-flight work, and recover
 	const [a, b] = await Promise.all([first, second]);
 	assert.equal(a.get('CNY'), context.bundledExchangeRates.get('CNY'));
 	assert.equal(a, b);
-	assert.equal(calls, 1);
+	assert(calls <= 2, 'concurrent callers must share one primary/mirror request sequence');
 	const fixture = onlineFixture(context);
-	context.fetch = async () => ({ ok: true, json: async () => fixture });
+	context.fetch = async () => ({ ok: true, text: async () => JSON.stringify(fixture) });
 	assert.equal((await context.refreshExchangeRates()).get('CNY'), 7.25);
-	completeLate({ ok: true, json: async () => onlineFixture(context, 99) });
+	completeLate({ ok: true, text: async () => JSON.stringify(onlineFixture(context, 99)) });
 	await new Promise(resolve => setImmediate(resolve));
 	assert.equal((await context.getExchangeRates()).get('CNY'), 7.25);
 });
@@ -128,7 +128,7 @@ test('slow requests fall back within deadline, share in-flight work, and recover
 test('blocked browser storage does not prevent online conversion', async () => {
 	const context = ratesContext({ localStorage: { getItem() { throw new Error('blocked'); }, setItem() { throw new Error('full'); } } });
 	await context.refreshExchangeRates();
-	context.fetch = async () => ({ ok: true, json: async () => onlineFixture(context) });
+	context.fetch = async () => ({ ok: true, text: async () => JSON.stringify(onlineFixture(context)) });
 	assert.equal((await context.refreshExchangeRates()).get('CNY'), 7.25);
 	assert.equal(context.exchangeRatesSource, 'online');
 });
@@ -155,10 +155,10 @@ test('temperature and arithmetic never wait for rates; currency submission refre
 	assert.equal((await context.fend('100 USD to CNY', 100, '', false)).result, `${100 * context.bundledExchangeRates.get('CNY')} CNY`);
 	assert(Date.now() - started < 1000, 'temperature, arithmetic and hints must not wait for the 3-second rates timeout');
 	const submitted = context.fend('100 USD to CNY', 1000, '');
-	finishFetch({ ok: true, json: async () => onlineFixture(context, 7.25) });
+	finishFetch({ ok: true, text: async () => JSON.stringify(onlineFixture(context, 7.25)) });
 	await pending;
 	// The submission can start its own new refresh once the prefetch completes.
-	context.fetch = async () => ({ ok: true, json: async () => onlineFixture(context, 7.25) });
+	context.fetch = async () => ({ ok: true, text: async () => JSON.stringify(onlineFixture(context, 7.25)) });
 	assert.equal((await submitted).result, '725 CNY');
 });
 
@@ -246,7 +246,7 @@ test('invalid exchange-rate snapshots fail the build', async () => {
 	try {
 		await cp('assets', join(dir, 'assets'), { recursive: true });
 		await writeFile(join(dir, 'exchange-rates.xml'), '<html>temporarily unavailable</html>');
-		assert.throws(() => execFileSync(process.execPath, ['scripts/patch-rates.mjs', dir], { stdio: 'pipe' }), /missing required currencies/);
+		assert.throws(() => execFileSync(process.execPath, ['scripts/patch-rates.mjs', dir], { stdio: 'pipe' }), /Invalid|missing required currencies/i);
 	} finally { await rm(dir, { recursive: true, force: true }); }
 });
 
@@ -255,6 +255,7 @@ test('scheduled refresh saves changed rates and reports unchanged snapshots', as
 	try {
 		await mkdir(join(dir, 'scripts'));
 		await cp('scripts/fetch-rates.mjs', join(dir, 'scripts', 'fetch-rates.mjs'));
+		await cp('scripts/snapshot-data.mjs', join(dir, 'scripts', 'snapshot-data.mjs'));
 		const snapshot = await readFile('exchange-rates.xml', 'utf8');
 		await writeFile(join(dir, 'incoming.xml'), snapshot);
 		// Stub only the network response; execute the real refresh script against its
