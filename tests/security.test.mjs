@@ -95,15 +95,14 @@ test('oversized online streams are cancelled and cannot replace good rates', asy
  assert.equal(context.exchangeRatesSource, 'bundled');
 });
 
-test('a stalled primary endpoint leaves time for a working mirror', async () => {
+test('a stalled primary cannot delay a working parallel mirror', async () => {
  const context = vm.createContext({ AbortController, TextDecoder, setTimeout: (fn, ms) => setTimeout(fn, Math.min(ms, 25)), clearTimeout,
   fetch: async () => { throw new Error('offline'); }, localStorage: { getItem: () => null, setItem() {} } });
  vm.runInContext(rates, context);
  await context.refreshExchangeRates();
  const fixture = { date: new Date().toISOString().slice(0, 10), usd: Object.fromEntries([...context.bundledExchangeRates].map(([c,v]) => [c.toLowerCase(),v])) };
  fixture.usd.cny = 7.5;
- // Keep the global 3s deadline while accelerating the primary 1.5s timeout.
- context.setTimeout = (fn, ms) => setTimeout(fn, ms >= 2900 ? 1000 : 10);
+ context.setTimeout = (fn, ms) => setTimeout(fn, Math.min(ms, 1000));
  context.fetch = async url => url.includes('jsdelivr') ? new Promise(() => {}) : { ok: true, text: async () => JSON.stringify(fixture) };
  assert.equal((await context.refreshExchangeRates()).get('CNY'), 7.5);
 });
@@ -188,4 +187,36 @@ test('keystore helper never logs credentials, creates private files and refuses 
   assert.throws(() => execFileSync('bash', ['scripts/make-keystore.sh', key], { env, stdio: 'pipe' }), /Refusing to overwrite/);
   assert.equal(await readFile(key, 'utf8'), 'FAKE_KEY_FOR_TEST');
  } finally { await rm(dir, { recursive: true, force: true }); }
+});
+
+test('online rate updates refresh typed hints without overwriting newer input or interrupting submissions', async () => {
+ const handlers = new Map(), refs = [], transitions = [], hints = [];
+ let cleanup, finishHint;
+ const context = vm.createContext({
+  import_react: {
+   useRef: value => { const ref = { current: value }; refs.push(ref); return ref; },
+   useEffect: effect => { cleanup = effect(); },
+   startTransition: callback => transitions.push(callback())
+  },
+  window: { addEventListener: (name, handler) => handlers.set(name, handler), removeEventListener: name => handlers.delete(name) },
+  submittedQueries: 0, setHint: value => hints.push(value),
+  evaluateHint: value => new Promise(resolve => { finishHint = resolve; })
+ });
+ vm.runInContext(await readFile('scripts/hint-runtime.js', 'utf8'), context);
+ refs[0].current = '100 USD to SGD';
+ const update = detail => handlers.get('fend-rates')({ detail });
+ update({ source: 'bundled', refreshing: false });
+ update({ source: 'online', refreshing: true });
+ assert.equal(transitions.length, 0);
+ update({ source: 'online', refreshing: false });
+ finishHint('128.041753 SGD'); await transitions.at(-1);
+ assert.deepEqual(hints, ['128.041753 SGD']);
+ update({ source: 'online', refreshing: false });
+ refs[0].current = '1 + 1'; refs[1].current++;
+ finishHint('stale preview'); await transitions.at(-1);
+ assert.deepEqual(hints, ['128.041753 SGD']);
+ context.submittedQueries = 1;
+ update({ source: 'online', refreshing: false });
+ assert.equal(transitions.length, 2);
+ cleanup(); assert.equal(handlers.size, 0);
 });

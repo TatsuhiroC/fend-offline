@@ -6,12 +6,14 @@ var currencyRateEndpoints = [
 	'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.min.json',
 	'https://latest.currency-api.pages.dev/v1/currencies/usd.min.json'
 ];
-var currencyFetchTimeout = 3000;
+var currencyFetchTimeout = 15000;
 var currencyResponseLimit = 128 * 1024;
 var currencyRequest;
 var exchangeRateCache = bundledExchangeRates;
 var exchangeRatesDate = bundledRatesDate;
 var exchangeRatesSource = 'bundled';
+var currencyRefreshing = false;
+var currencyFailure = '';
 
 function parseOnlineRates(data) {
 	if (!data || !/^\d{4}-\d{2}-\d{2}$/.test(data.date) || !data.usd || typeof data.usd !== 'object') {
@@ -37,7 +39,7 @@ function parseOnlineRates(data) {
 function notifyExchangeRates() {
 	if (typeof window === 'undefined') return;
 	window.dispatchEvent(new CustomEvent('fend-rates', { detail: {
-		source: exchangeRatesSource, date: exchangeRatesDate
+		source: exchangeRatesSource, date: exchangeRatesDate, refreshing: currencyRefreshing, failure: currencyFailure
 	} }));
 }
 
@@ -87,49 +89,41 @@ async function refreshExchangeRates() {
 	currencyRequest = (async () => {
 		const controller = new AbortController();
 		let timer;
+		currencyRefreshing = true;
+		currencyFailure = '';
+		notifyExchangeRates();
 		try {
-			// Race the entire operation, including JSON parsing, against one deadline.
-			// A stalled first mirror cannot prevent local fallback or a later retry.
-			const download = (async () => {
-				const started = Date.now();
-				for (const [index, endpoint] of currencyRateEndpoints.entries()) {
-					const endpointController = new AbortController();
-					const abort = () => endpointController.abort();
-					controller.signal.addEventListener('abort', abort, { once: true });
-					const budget = Math.max(1, (currencyFetchTimeout - (Date.now() - started)) / (currencyRateEndpoints.length - index));
-					let endpointTimer;
-					try {
-						const data = await Promise.race([(async () => {
-							const response = await fetch(endpoint, { cache: 'no-store', signal: endpointController.signal });
-							if (!response.ok) throw new Error('Exchange-rate HTTP ' + response.status);
-							return await readCurrencyResponse(response);
-						})(), new Promise((_, reject) => {
-							endpointTimer = setTimeout(() => { endpointController.abort(); reject(new Error('Mirror timeout')); }, budget);
-						})]);
-						const map = parseOnlineRates(data);
-						if (exchangeRatesSource !== 'bundled' && data.date < exchangeRatesDate) throw new Error('Exchange rates are older than saved data');
-						if (controller.signal.aborted) throw new Error('Exchange-rate timeout');
-						return { data, map };
-					} catch (error) {
-						if (controller.signal.aborted) throw error;
-					} finally {
-						clearTimeout(endpointTimer);
-						controller.signal.removeEventListener('abort', abort);
-					}
-				}
-				throw new Error('Exchange-rate services unavailable');
-			})();
-			const { data, map } = await Promise.race([download, new Promise((_, reject) => {
-				timer = setTimeout(() => { controller.abort(); reject(new Error('Exchange-rate timeout')); }, currencyFetchTimeout);
+			// Race mirrors together so neither a blocked mirror nor a short sliced
+			// deadline can discard a healthy, slower connection. The deadline covers
+			// headers, body reading and validation, and still bounds offline fallback.
+			const downloads = currencyRateEndpoints.map(async endpoint => {
+				const response = await fetch(endpoint, { cache: 'no-store', signal: controller.signal });
+				if (!response.ok) throw new Error('Exchange-rate HTTP ' + response.status);
+				const data = await readCurrencyResponse(response);
+				const map = parseOnlineRates(data);
+				if (exchangeRatesSource !== 'bundled' && data.date < exchangeRatesDate) throw new Error('Exchange rates are older than saved data');
+				if (controller.signal.aborted) throw new Error('Exchange-rate request ended');
+				return { data, map };
+			});
+			const { data, map } = await Promise.race([Promise.any(downloads), new Promise((_, reject) => {
+				timer = setTimeout(() => {
+					const error = new Error('Exchange-rate update timed out');
+					error.name = 'TimeoutError';
+					reject(error);
+					controller.abort();
+				}, currencyFetchTimeout);
 			})]);
 			exchangeRateCache = map;
 			exchangeRatesDate = data.date;
 			exchangeRatesSource = 'online';
 			try { localStorage.setItem(currencyStorageKey, JSON.stringify(data)); } catch {}
-		} catch {
+		} catch (error) {
+			currencyFailure = error?.name === 'TimeoutError' ? 'timeout' : 'unavailable';
 			exchangeRatesSource = exchangeRatesSource === 'bundled' ? 'bundled' : 'saved';
 		} finally {
 			clearTimeout(timer);
+			controller.abort();
+			currencyRefreshing = false;
 			notifyExchangeRates();
 		}
 		return exchangeRateCache;
