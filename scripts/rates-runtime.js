@@ -80,8 +80,10 @@ async function readCurrencyResponse(response) {
 function usesCurrency(input, result) {
 	const text = input + ' ' + (result.ok ? result.result : result.message);
 	const codes = text.match(/\b[A-Za-z]{3}\b/g) || [];
-	return codes.some(code => bundledExchangeRates.has(code.toUpperCase()) || ['BTC', 'ETH', 'XAU', 'XAG'].includes(code.toUpperCase())) ||
-		/[$€£¥₹₩₽]|\b(currency|currencies|dollars?|cents?|euros?|pounds?|sterling|yuans?|renminbi|rmb|francs?|yen|rupees?|r[ou]+bles?|won|pesos?|dirhams?|riyals?|dinars?|krona|kroner|shillings?|liras?|reais|baht|ringgit)\b/i.test(text);
+	// fend resolves lower-case `cup` as a volume unit; CUP/Cup are currency.
+	// Plain pound/pounds are mass units; GBP, £ and sterling denote currency.
+	return codes.some(code => code !== 'cup' && (bundledExchangeRates.has(code.toUpperCase()) || ['BTC', 'ETH', 'XAU', 'XAG'].includes(code.toUpperCase()))) ||
+		/[$€£¥₹₩₽]|\b(currency|currencies|dollars?|cents?|euros?|sterling|yuans?|renminbi|rmb|francs?|yen|rupees?|r[ou]+bles?|won|pesos?|dirhams?|riyals?|dinars?|krona|kroner|shillings?|liras?|reais|baht|ringgit)\b/i.test(text);
 }
 
 async function refreshExchangeRates() {

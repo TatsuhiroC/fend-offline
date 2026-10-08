@@ -19,6 +19,30 @@ const historyLimit = 'if (newEntry.startsWith(" ")) return;';
 const historyReturn = 'return updatedHistory;';
 const bundles = readdirSync(assets).filter(name => /^App-.*\.js$/.test(name));
 if (!bundles.length) throw new Error('[runtime] no App bundle found');
+function pruneUnusedRuntime(source) {
+	const waitRegion = /\/\/#region src\/lib\/WaitGroup\.ts\n[\s\S]*?\/\/#endregion\n/;
+	if (!waitRegion.test(source)) throw new Error('[runtime] upstream WaitGroup region changed');
+	const withoutWait = source.replace(waitRegion, '');
+	if (/\b(?:WaitGroup|abortPromise)\b/.test(withoutWait)) {
+		throw new Error('[runtime] waiting helpers still have callers; patch rates first');
+	}
+	const start = withoutWait.indexOf('var import_dist = (');
+	const end = withoutWait.indexOf('\nfunction PendingOutput(', start);
+	if (start < 0 || end < 0) throw new Error('[runtime] upstream spinner module changed');
+	const module = withoutWait.slice(start, end);
+	const rest = withoutWait.slice(0, start) + withoutWait.slice(end);
+	if (!module.trimEnd().endsWith('})))();') ||
+		[...rest.matchAll(/\bimport_dist\b/g)].length !== 1 ||
+		!/\bimport_dist\.ThreeDotsScale\b/.test(rest)) {
+		throw new Error('[runtime] spinner consumers changed; review retained exports');
+	}
+	// Retain the exact upstream component and its React binding, including SVG
+	// animation timing and accessibility behavior. Discard the unused module exports.
+	const component = module.match(/\tvar (import_react\d+) = __toESM\(require_react\(\)\);\n(\tfunction ThreeDotsScale\([\s\S]*?\n\t})\n/);
+	if (!component) throw new Error('[runtime] upstream ThreeDotsScale component changed');
+	const spinner = `var import_dist = (() => {\n\tvar ${component[1]} = __toESM(require_react());\n${component[2]}\n\treturn { ThreeDotsScale };\n})();`;
+	return withoutWait.slice(0, start) + spinner + withoutWait.slice(end);
+}
 for (const name of bundles) {
 	const file = join(assets, name);
 	const source = readFileSync(file, 'utf8');
@@ -40,6 +64,6 @@ for (const name of bundles) {
 		.replace(historyReturn, 'return updatedHistory.slice(-100);')
 		.replace(oldSubmit, 'submit();\n\t\t\t\tonInput("");\n\t\t\t\tconst fendResult = await evaluate(currentInput);\n\t\t\t\tif (!fendResult.ok && fendResult.message === "cancelled") return;')
 		.replaceAll('setOutput(null);', 'cancelCalculations();\n\t\t\t\tsetOutput(null);');
-	writeFileSync(file, patched);
+	writeFileSync(file, pruneUnusedRuntime(patched));
 	console.log(`[runtime] ${name}: recoverable workers, safe history and submitted-input handling`);
 }
