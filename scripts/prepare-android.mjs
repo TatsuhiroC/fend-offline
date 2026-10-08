@@ -43,35 +43,48 @@ const storePassword = process.env.ANDROID_KEYSTORE_PASSWORD ?? '';
 const keyAlias = process.env.ANDROID_KEY_ALIAS ?? '';
 const keyPassword = process.env.ANDROID_KEY_PASSWORD ?? '';
 const signingReady = Boolean(keystoreB64 && storePassword && keyAlias && keyPassword);
+const keystore = signingReady ? Buffer.from(keystoreB64, 'base64') : undefined;
+if (keystore && (keystore.length < 100 || !/^[A-Za-z0-9+/]+={0,2}$/.test(keystoreB64))) fail('ANDROID_KEYSTORE_BASE64 does not decode to a keystore file');
 
 // ---------------------------------------------------------------- version stamping
 function parseVersion(raw) {
 	const clean = (raw ?? '').trim().replace(/^v/i, '');
-	const match = /^(\d+)\.(\d+)\.(\d+)/.exec(clean);
+	const match = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.exec(clean);
 	return match ? { major: +match[1], minor: +match[2], patch: +match[3], clean } : null;
 }
 
 const refType = process.env.GITHUB_REF_TYPE ?? '';
 const refName = (process.env.GITHUB_REF_NAME ?? '').trim();
-const runNumber = Number.parseInt(process.env.GITHUB_RUN_NUMBER ?? '', 10);
-const sha = (process.env.GITHUB_SHA ?? '').slice(0, 7);
+const runText = process.env.GITHUB_RUN_NUMBER ?? '';
+const runNumber = /^[1-9]\d*$/.test(runText) ? Number(runText) : NaN;
+const sha = /^[a-f0-9]{7,40}$/i.test(process.env.GITHUB_SHA ?? '') ? process.env.GITHUB_SHA.slice(0, 7) : '';
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
 
 let versionName;
 let versionCode;
 
-if (refType === 'tag' && parseVersion(refName)) {
+if (refType === 'tag') {
 	const v = parseVersion(refName);
+	if (!v) fail('Release tag must be a complete semantic version such as v1.0.2');
+	if (!signingReady) fail('Tagged releases require all four stable signing secrets');
 	versionName = v.clean;
-	versionCode = v.major * 10000 + v.minor * 100 + v.patch; // 1.0.1 -> 10001
 } else if (parseVersion(pkg.version) && Number.isFinite(runNumber)) {
-	// main-branch builds: monotonically increasing, clearly below the tag scheme
+	// Branch builds keep a descriptive name; both branches and tags share the
+	// same versionCode counter so a branch APK can upgrade an installed release.
 	const v = parseVersion(pkg.version);
 	versionName = `${v.clean}-dev.${runNumber}${sha ? `+${sha}` : ''}`;
-	versionCode = runNumber;
 } else {
 	versionName = undefined;
 	versionCode = undefined;
+}
+if ((refType === 'tag' || process.env.GITHUB_ACTIONS === 'true') && (!Number.isSafeInteger(runNumber) || runNumber <= 0 || !versionName)) {
+	fail('CI build requires valid version metadata and a positive run number');
+}
+if (versionName !== undefined && Number.isSafeInteger(runNumber) && runNumber > 0) {
+	// Above previously shipped 1.x semver codes (v1.0.1 used 10001), with one
+	// monotonic Actions counter for every build of this workflow.
+	versionCode = 100000 + runNumber;
+	if (versionCode > 2100000000) fail('versionCode exceeds the Android limit');
 }
 
 // ---------------------------------------------------------------- injected gradle
@@ -115,16 +128,15 @@ if (signingReady) {
 lines.push('}', MARKER, '');
 
 const gradle = readFileSync(gradlePath, 'utf8');
-if (!gradle.includes(MARKER)) {
-	writeFileSync(gradlePath, gradle.replace(/\s*$/, '\n') + lines.join('\n'));
-}
+const pieces = gradle.split(MARKER);
+if (pieces.length !== 1 && pieces.length !== 3) fail('Malformed previous signing/version block');
+const baseGradle = pieces.length === 3 ? pieces[0] + pieces[2] : gradle;
+writeFileSync(gradlePath, baseGradle.replace(/\s*$/, '\n') + lines.join('\n'));
 
 // ---------------------------------------------------------------- keystore + props
 let mode = 'debug';
 
 if (signingReady) {
-	const keystore = Buffer.from(keystoreB64, 'base64');
-	if (keystore.length < 100) fail('ANDROID_KEYSTORE_BASE64 does not decode to a keystore file');
 	mkdirSync(join(androidDir, 'app'), { recursive: true });
 	writeFileSync(join(androidDir, KEYSTORE), keystore, { mode: 0o600 });
 
@@ -137,7 +149,8 @@ if (signingReady) {
 			.replace(/\t/g, '\\t')
 			.replace(/([=:#!])/g, '\\$1')
 			.replace(/^ /, '\\ ')
-			.replace(/ $/, '\\ ');
+			.replace(/ $/, '\\ ')
+			.replace(/[^\x20-\x7e]/g, char => '\\u' + char.charCodeAt(0).toString(16).padStart(4, '0'));
 	writeFileSync(
 		join(androidDir, PROPS),
 		[
@@ -150,7 +163,7 @@ if (signingReady) {
 		{ mode: 0o600 }
 	);
 	mode = 'release';
-	console.log(`[android] release signing configured (alias "${keyAlias}", keystore ${keystore.length} bytes)`);
+	console.log(`[android] release signing configured (keystore ${keystore.length} bytes)`);
 } else {
 	annotate(
 		'warning',

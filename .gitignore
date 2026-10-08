@@ -9,3 +9,6 @@ keystore.properties
 *.keystore
 *.jks
 apk-certs.txt
+.signing/
+*.secrets/
+exchange-rates.xml.tmp
