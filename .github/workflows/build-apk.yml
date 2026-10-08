@@ -76,6 +76,7 @@ jobs:
       - name: Verify APK signature
         env:
           EXPECTED_CERT: ${{ secrets.ANDROID_CERT_SHA256 }}
+          SIGNING_MODE: ${{ steps.signing.outputs.mode }}
         run: |
           set -euo pipefail
           APK="${{ steps.signing.outputs.apk_path }}"
@@ -86,20 +87,7 @@ jobs:
           fi
           BUILD_TOOLS="$(ls -d "${ANDROID_HOME:-/usr/local/lib/android/sdk}"/build-tools/* | sort -V | tail -1)"
           "$BUILD_TOOLS/apksigner" verify --print-certs "$APK" | tee apk-certs.txt
-          if [ "${{ steps.signing.outputs.mode }}" = "release" ]; then
-            if grep -q "^Signer #1 certificate DN: CN=Android Debug" apk-certs.txt; then
-              echo "::error::release APK is signed with a debug key — the signing config was not applied"
-              exit 1
-            fi
-          fi
-          if [ -n "$EXPECTED_CERT" ]; then
-            # apksigner prints the digest without separators, so normalise whatever format
-            # the secret uses (the docs suggest colons) before comparing.
-            EXPECTED="$(printf '%s' "$EXPECTED_CERT" | tr -d ':' | tr '[:upper:]' '[:lower:]')"
-            [[ "$EXPECTED" =~ ^[0-9a-f]{64}$ ]] || { echo "::error::Invalid expected certificate digest"; exit 1; }
-            grep -qi "^Signer #1 certificate SHA-256 digest: $EXPECTED$" apk-certs.txt ||
-              { echo "::error::APK certificate does not match ANDROID_CERT_SHA256"; exit 1; }
-          fi
+          node scripts/verify-apk-certs.mjs apk-certs.txt
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7

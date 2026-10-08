@@ -75,3 +75,21 @@ test('branch and release APKs share increasing codes above the legacy installed 
 		assert(codes[2] > codes[1]);
 	} finally { await rm(dir, { recursive: true, force: true }); }
 });
+
+test('certificate verification accepts both apksigner formats and rejects wrong/debug signers', async () => {
+ const { verifyCertificates } = await import('../scripts/verify-apk-certs.mjs');
+ const digest = 'b688ed43cd12160a67b4522750db56ee3a9a965e5436a84f96c7318f264c6c23';
+ for (const label of ['Signer #1', 'V2 Signer:', 'V3 Signer:']) {
+  const log = `${label} certificate DN: CN=fend, O=personal\n${label} certificate SHA-256 digest: ${digest}\n`;
+  assert.equal(verifyCertificates(log, digest, true), 1);
+  assert.equal(verifyCertificates(log, digest.toUpperCase().match(/../g).join(':') + '\n', true), 1);
+  assert.throws(() => verifyCertificates(log, 'a'.repeat(64), true), /does not match/);
+  assert.throws(() => verifyCertificates(log, 'invalid', true), /Invalid expected/);
+  const debug = log.replace('CN=fend', 'CN=Android Debug');
+  assert.throws(() => verifyCertificates(debug, digest, true), /debug key/);
+  assert.equal(verifyCertificates(debug, digest, false), 1);
+ }
+ assert.throws(() => verifyCertificates('Signer #1 public key SHA-256 digest: ' + digest, digest), /No APK signer/);
+ const mixed = `V2 Signer: certificate SHA-256 digest: ${digest}\nV3 Signer: certificate SHA-256 digest: ${'a'.repeat(64)}\n`;
+ assert.throws(() => verifyCertificates(mixed, digest), /does not match/);
+});
