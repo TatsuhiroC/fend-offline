@@ -1,85 +1,52 @@
 #!/usr/bin/env bash
-# Generate the Android release keystore used to sign fend-offline APKs, then print the
-# four GitHub Secrets you have to add (Settings -> Secrets and variables -> Actions).
-#
-# Keep the generated .keystore file safe: every future APK must be signed with this same
-# key, otherwise Android refuses to install the update over an existing install.
-#
-# Usage:
-#   bash scripts/make-keystore.sh [path/to/release.keystore]
-#   KEY_ALIAS=fend ANDROID_KEYSTORE_PASSWORD=... bash scripts/make-keystore.sh
-
+# Generate a new signing key and owner-only GitHub-secret files. Never print secrets.
+# Existing keys are never overwritten: upgrades must retain their original signer.
 set -euo pipefail
+umask 077
 
-KEYSTORE="${1:-$HOME/.fend-offline/release.keystore}"
-ALIAS="${KEY_ALIAS:-fend-offline}"
-DAYS="${VALIDITY_DAYS:-10000}"
+task_keystore="${1:-./.signing/release.keystore}"
+task_alias="${KEY_ALIAS:-fend-offline}"
+task_days="${VALIDITY_DAYS:-10000}"
+task_secret_dir="${task_keystore}.secrets"
 
-# macOS ships stub /usr/bin/keytool wrappers that fail unless a JDK is installed,
-# so probe it instead of trusting `command -v`.
 if ! keytool -help >/dev/null 2>&1; then
-	echo "keytool is not usable — no Java runtime found." >&2
-	echo "Install a JDK first, e.g.:  brew install --cask temurin" >&2
-	exit 1
+  echo 'keytool is not usable — install a JDK first.' >&2
+  exit 1
 fi
-
-if [ -e "$KEYSTORE" ]; then
-	echo "refusing to overwrite the existing keystore: $KEYSTORE" >&2
-	echo "delete it yourself if you really want to start over (existing installs would stop upgrading)." >&2
-	exit 1
+if [ -e "$task_keystore" ] || [ -e "$task_secret_dir" ]; then
+  echo 'Refusing to overwrite an existing signing key or secret directory.' >&2
+  exit 1
 fi
+case "$task_days" in ''|*[!0-9]*) echo 'VALIDITY_DAYS must be a positive integer.' >&2; exit 1;; esac
+if [ "$task_days" -le 0 ]; then echo 'VALIDITY_DAYS must be positive.' >&2; exit 1; fi
 
-PW="${ANDROID_KEYSTORE_PASSWORD:-}"
-if [ -z "$PW" ]; then
-	PW="$(openssl rand -base64 24 | tr -d '\n/+=' | cut -c1-24)"
-	echo "generated a store/key password for you (save it somewhere safe):"
-	echo
-	echo "    $PW"
-	echo
-fi
+task_password="${ANDROID_KEYSTORE_PASSWORD:-}"
+if [ -z "$task_password" ]; then task_password="$(openssl rand -base64 24 | tr -d '\n')"; fi
+mkdir -p "$(dirname "$task_keystore")"
+mkdir "$task_secret_dir"
+task_tmp="$(mktemp -d "$(dirname "$task_keystore")/.fend-key.XXXXXX")"
+task_complete=0
+trap 'rm -rf "$task_tmp"; if [ "$task_complete" -eq 0 ]; then rm -rf "$task_secret_dir"; fi' EXIT
 
-mkdir -p "$(dirname "$KEYSTORE")"
-keytool -genkeypair \
-	-keystore "$KEYSTORE" \
-	-alias "$ALIAS" \
-	-keyalg RSA \
-	-keysize 4096 \
-	-validity "$DAYS" \
-	-storepass "$PW" \
-	-keypass "$PW" \
-	-dname "CN=fend-offline, OU=personal, O=fend-offline, C=CN" \
-	> /dev/null
+# env form keeps the password out of command arguments and terminal logs.
+export FEND_KEYSTORE_PASSWORD="$task_password"
+keytool -genkeypair -keystore "$task_tmp/release.keystore" -alias "$task_alias" \
+  -keyalg RSA -keysize 4096 -validity "$task_days" \
+  -storepass:env FEND_KEYSTORE_PASSWORD -keypass:env FEND_KEYSTORE_PASSWORD \
+  -dname 'CN=fend-offline, OU=personal, O=fend-offline, C=CN' >/dev/null
+unset FEND_KEYSTORE_PASSWORD
 
-B64="$(base64 < "$KEYSTORE" | tr -d '\n')"
+base64 < "$task_tmp/release.keystore" | tr -d '\n' > "$task_secret_dir/ANDROID_KEYSTORE_BASE64"
+printf '%s' "$task_password" > "$task_secret_dir/ANDROID_KEYSTORE_PASSWORD"
+printf '%s' "$task_alias" > "$task_secret_dir/ANDROID_KEY_ALIAS"
+printf '%s' "$task_password" > "$task_secret_dir/ANDROID_KEY_PASSWORD"
+# An atomic no-overwrite publication also protects concurrent invocations.
+ln "$task_tmp/release.keystore" "$task_keystore"
+task_complete=1
+unset task_password
 
-cat <<EOF
-
-keystore written to: $KEYSTORE
-
-Add these four repository secrets (Settings -> Secrets and variables -> Actions):
-
-  ANDROID_KEYSTORE_BASE64
-$B64
-
-  ANDROID_KEYSTORE_PASSWORD
-$PW
-
-  ANDROID_KEY_ALIAS
-$ALIAS
-
-  ANDROID_KEY_PASSWORD
-$PW
-
-Or with the GitHub CLI (paste the values when prompted):
-
-  printf '%s' '$B64' | gh secret set ANDROID_KEYSTORE_BASE64 -R TatsuhiroC/fend-offline
-  gh secret set ANDROID_KEYSTORE_PASSWORD -R TatsuhiroC/fend-offline
-  gh secret set ANDROID_KEY_ALIAS -R TatsuhiroC/fend-offline
-  gh secret set ANDROID_KEY_PASSWORD -R TatsuhiroC/fend-offline
-
-Optional: pin the expected APK fingerprint so CI fails if signing ever changes:
-
-  keytool -list -v -keystore "$KEYSTORE" -storepass '<password>' | grep SHA256
-
-then add the SHA-256 (with colons) as the ANDROID_CERT_SHA256 secret.
-EOF
+printf 'Signing key saved to: %s\nOwner-only secret files saved to: %s\n' "$task_keystore" "$task_secret_dir"
+echo 'Back up the signing key and credentials securely. Upload the files using stdin:'
+for task_secret in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+  printf '  gh secret set %s -R TatsuhiroC/fend-offline < %q\n' "$task_secret" "$task_secret_dir/$task_secret"
+done

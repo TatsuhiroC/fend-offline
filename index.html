@@ -24,16 +24,67 @@
 	header p {
 		margin: 0;
 	}
+	#rates-status { margin-top: 0.5em; }
 </style>
 </head>
 <body>
 <header>
 	<p>by <a href="https://github.com/TatsuhiroC">TatsuhiroC</a> · <a href="https://github.com/TatsuhiroC/fend-offline">fend-offline</a> · engine <a href="https://github.com/printfn/fend">fend</a> (MIT)</p>
+	<p id="rates-status" role="status"></p>
 </header>
 <div id="root"></div>
 <script>
-if ('serviceWorker' in navigator) {
-	navigator.serviceWorker.register('sw.js');
+window.addEventListener('fend-rates', ({ detail }) => {
+	const labels = { online: 'Online rates', saved: 'Offline fallback · saved rates', bundled: 'Offline fallback · built-in rates' };
+	document.getElementById('rates-status').textContent = `${labels[detail.source]} · ${detail.date}`;
+});
+const nativeApp = Boolean(window.Capacitor?.isNativePlatform?.());
+if (nativeApp && 'serviceWorker' in navigator) {
+	// APK assets are already offline. Retire browser caches without touching saved
+	// rates in localStorage, so a new APK always uses its packaged frontend.
+	(async () => {
+		const registrations = await navigator.serviceWorker.getRegistrations();
+		await Promise.all(registrations.map(registration => registration.unregister()));
+		if ('caches' in window) {
+			const keys = await caches.keys();
+			await Promise.all(keys.filter(key => key.startsWith('fend-') || key.startsWith('fend:')).map(key => caches.delete(key)));
+		}
+		if (navigator.serviceWorker.controller) location.reload();
+	})().catch(console.warn);
+}
+if ('serviceWorker' in navigator && !nativeApp) {
+	let updating = false;
+	let controlled = Boolean(navigator.serviceWorker.controller);
+	let offerUpdate = () => {};
+	navigator.serviceWorker.addEventListener('controllerchange', () => {
+		if (updating) location.reload();
+		else if (controlled) offerUpdate(true);
+		controlled = true;
+	});
+	navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(registration => {
+		offerUpdate = (activated = false) => {
+			if ((!activated && !registration.waiting) || !navigator.serviceWorker.controller || document.getElementById('app-update')) return;
+			const button = document.createElement('button');
+			button.id = 'app-update';
+			button.textContent = 'Update available — tap to reload';
+			button.onclick = () => {
+				if (!registration.waiting) { location.reload(); return; }
+				updating = true;
+				button.disabled = true;
+				registration.waiting.postMessage('SKIP_WAITING');
+			};
+			document.querySelector('header').append(button);
+		};
+		registration.addEventListener('updatefound', () => {
+			registration.installing?.addEventListener('statechange', () => offerUpdate());
+		});
+		offerUpdate();
+		const check = () => {
+			if (document.visibilityState === 'visible') registration.update().catch(console.warn);
+		};
+		document.addEventListener('visibilitychange', check);
+		check();
+	}).catch(console.warn);
 }
 </script>
 <script type="module" src="assets/main-BGizNAwM.js"></script>

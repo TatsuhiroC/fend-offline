@@ -1,17 +1,32 @@
 {
 	"name": "fend-offline",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"private": true,
 	"description": "fend offline calculator — Android APK build via Capacitor",
 	"scripts": {
-		"build:web": "mkdir -p www && cp index.html manifest.json sw.js icon-192.png icon-512.png icon-maskable-512.png exchange-rates.xml www/ && cp -r assets www/ && node scripts/patch-rates.mjs www && node scripts/patch-sw.mjs www",
+		"build:web": "rm -rf www && mkdir -p www && cp index.html manifest.json sw.js icon-192.png icon-512.png icon-maskable-512.png exchange-rates.xml THIRD_PARTY_NOTICES.txt www/ && cp -r assets www/ && node scripts/patch-rates.mjs www && node scripts/patch-runtime.mjs www && node scripts/version-assets.mjs www && node scripts/patch-sw.mjs www",
 		"rates:update": "node scripts/fetch-rates.mjs",
+		"test:web": "npm run build:web && node --test tests/*.test.mjs",
 		"android:keystore": "bash scripts/make-keystore.sh"
 	},
 	"devDependencies": {
-		"@capacitor/android": "^8.5.2",
+		"@capacitor/android": "^8.5.3",
 		"@capacitor/assets": "^3.0.5",
-		"@capacitor/cli": "^8.5.2",
-		"@capacitor/core": "^8.5.2"
+		"@capacitor/cli": "^8.5.3",
+		"@capacitor/core": "^8.5.3"
+	},
+	"engines": {
+		"node": ">=22.14.0"
+	},
+	"overrides": {
+		"@capacitor/assets": {
+			"@capacitor/cli": "$@capacitor/cli",
+			"sharp": "^0.35.5"
+		},
+		"@xmldom/xmldom": "^0.9.12",
+		"brace-expansion": "^5.0.12",
+		"xcode": {
+			"uuid": "^11.1.1"
+		}
 	}
 }

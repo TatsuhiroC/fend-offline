@@ -7,31 +7,37 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      mode: ${{ steps.signing.outputs.mode }}
+      version: ${{ steps.signing.outputs.version_name }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 24
           cache: npm
 
-      - uses: actions/setup-java@v6
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
         with:
           distribution: temurin
           java-version: 21
 
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Copy web assets into www/
-        run: npm run build:web
+      - name: Build and test web assets for the APK
+        run: npm run test:web
 
       - name: Generate Android project
         run: npx cap add android
@@ -68,6 +74,9 @@ jobs:
       # A release APK that silently ends up unsigned would break every future upgrade,
       # so fail loudly here instead of shipping it.
       - name: Verify APK signature
+        env:
+          EXPECTED_CERT: ${{ secrets.ANDROID_CERT_SHA256 }}
+          SIGNING_MODE: ${{ steps.signing.outputs.mode }}
         run: |
           set -euo pipefail
           APK="${{ steps.signing.outputs.apk_path }}"
@@ -78,35 +87,37 @@ jobs:
           fi
           BUILD_TOOLS="$(ls -d "${ANDROID_HOME:-/usr/local/lib/android/sdk}"/build-tools/* | sort -V | tail -1)"
           "$BUILD_TOOLS/apksigner" verify --print-certs "$APK" | tee apk-certs.txt
-          if [ "${{ steps.signing.outputs.mode }}" = "release" ]; then
-            if grep -q "^Signer #1 certificate DN: CN=Android Debug" apk-certs.txt; then
-              echo "::error::release APK is signed with a debug key — the signing config was not applied"
-              exit 1
-            fi
-          fi
-          if [ -n "${{ secrets.ANDROID_CERT_SHA256 }}" ]; then
-            # apksigner prints the digest without separators, so normalise whatever format
-            # the secret uses (the docs suggest colons) before comparing.
-            EXPECTED="$(printf '%s' "${{ secrets.ANDROID_CERT_SHA256 }}" | tr -d ':' | tr '[:upper:]' '[:lower:]')"
-            grep -qi "$EXPECTED" apk-certs.txt ||
-              { echo "::error::APK certificate does not match ANDROID_CERT_SHA256"; exit 1; }
-          fi
+          node scripts/verify-apk-certs.mjs apk-certs.txt
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: fend-offline-${{ steps.signing.outputs.mode }}-apk
           path: ${{ steps.signing.outputs.apk_path }}
 
-      - name: Attach APK to GitHub Release (tagged builds)
-        if: startsWith(github.ref, 'refs/tags/')
+  publish:
+    if: startsWith(github.ref, 'refs/tags/') && needs.build.outputs.mode == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      # Publishing runs without checkout, npm dependencies, Gradle or signing secrets.
+      - name: Attach verified APK to GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-          APK: ${{ steps.signing.outputs.apk_path }}
-          VERSION: ${{ steps.signing.outputs.version_name }}
+          GH_REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          VERSION: ${{ needs.build.outputs.version }}
         run: |
-          ASSET="fend-offline-${VERSION:-$GITHUB_REF_NAME}.apk"
-          cp "$APK" "$ASSET"
-          gh release create "$GITHUB_REF_NAME" "$ASSET" \
-            --title "$GITHUB_REF_NAME" --generate-notes \
-            || gh release upload "$GITHUB_REF_NAME" "$ASSET" --clobber
+          set -euo pipefail
+          gh run download "$RUN_ID" --name fend-offline-release-apk --dir artifact
+          ASSET="fend-offline-${VERSION}.apk"
+          cp artifact/app-release.apk "$ASSET"
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "$ASSET" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "$ASSET" --title "$GITHUB_REF_NAME" --generate-notes
+          fi
