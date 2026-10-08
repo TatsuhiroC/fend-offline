@@ -41,6 +41,7 @@ var evaluationGeneration = 0;
 var submittedQueries = 0;
 function cancelCalculations() {
 	++evaluationGeneration;
+	submittedQueries = 0;
 	workerCache?.cancel();
 }
 async function query(args) {
@@ -76,10 +77,12 @@ async function fend(input, timeout, variables, freshRates = true) {
 	// Hints cannot cancel a submitted calculation, and blank hints need no worker.
 	if (!freshRates && (submittedQueries > 0 || !input.trim())) return { ok: false, message: 'cancelled' };
 	const generation = freshRates ? ++evaluationGeneration : evaluationGeneration;
-	if (freshRates) ++submittedQueries;
+	if (freshRates) submittedQueries = 1;
 	try {
 		const args = { input, timeout, variables, currencyData: await getExchangeRates() };
+		if (freshRates && generation !== evaluationGeneration) return { ok: false, message: 'cancelled' };
 		let result = await query(args);
+		if (freshRates && generation !== evaluationGeneration) return { ok: false, message: 'cancelled' };
 		if (freshRates && usesCurrency(input, result)) {
 			args.currencyData = await refreshExchangeRates();
 			if (generation !== evaluationGeneration) return { ok: false, message: 'cancelled' };
@@ -91,5 +94,9 @@ async function fend(input, timeout, variables, freshRates = true) {
 		if (error?.name === 'AbortError') return { ok: false, message: 'cancelled' };
 		console.error(error);
 		return { ok: false, message: error instanceof Error ? error.message : 'Calculator could not start' };
-	} finally { if (freshRates) --submittedQueries; }
+	} finally {
+		// Superseded submissions can keep waiting for a shared rate download, but
+		// must not block hints or clear the active submission's pending state.
+		if (freshRates && generation === evaluationGeneration) submittedQueries = 0;
+	}
 }

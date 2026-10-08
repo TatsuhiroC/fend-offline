@@ -8,6 +8,38 @@ const NATIVE_APP = self.location.origin === NATIVE_ORIGIN;
 const CACHE_NAMESPACE = 'fend:' + self.registration.scope + ':';
 const CACHE_NAME = CACHE_NAMESPACE + CACHE;
 const ASSET_URLS = new Set(ASSETS.map(url => new URL(url, self.registration.scope).href));
+const ASSET_VERSION = ASSETS.join('\n').match(/\/assets\/([a-f0-9]{16})\//)?.[1];
+const clientVersions = new Map();
+let activeWorker = self.registration.active;
+
+function canCleanupCaches() {
+	return self.registration.active === activeWorker && !self.registration.installing && !self.registration.waiting;
+}
+
+async function isAppCache(key) {
+	if (key.startsWith(CACHE_NAMESPACE)) return true;
+	if (!key.startsWith('fend-')) return false;
+	const requests = await (await caches.open(key)).keys();
+	return requests.length > 0 && requests.every(request => request.url.startsWith(self.registration.scope));
+}
+
+async function cleanupObsoleteCaches() {
+	// A waiting/installing worker already owns a future cache. Never remove it,
+	// and never let a superseded worker delete its successor's active cache.
+	if (!canCleanupCaches()) return;
+	const windows = (await self.clients.matchAll({ type: 'window', includeUncontrolled: true }))
+		.filter(client => client.url.startsWith(self.registration.scope));
+	const liveIds = new Set(windows.map(client => client.id));
+	for (const id of clientVersions.keys()) if (!liveIds.has(id)) clientVersions.delete(id);
+	// Existing windows may still need a lazy worker from an older asset graph.
+	// Unknown/legacy windows are retained conservatively until closed or upgraded.
+	if (!ASSET_VERSION || windows.some(client => clientVersions.get(client.id) !== ASSET_VERSION)) return;
+	for (const key of await caches.keys()) {
+		if (key === CACHE_NAME || !await isAppCache(key)) continue;
+		if (!canCleanupCaches()) return;
+		await caches.delete(key);
+	}
+}
 
 self.addEventListener('install', e => {
 	e.waitUntil((async () => {
@@ -25,9 +57,15 @@ self.addEventListener('install', e => {
 
 self.addEventListener('message', e => {
 	if (e.data === 'SKIP_WAITING') e.waitUntil(self.skipWaiting());
+	if (!NATIVE_APP && e.data?.type === 'FEND_CLIENT_VERSION' && e.source?.type === 'window' &&
+		e.source.url.startsWith(self.registration.scope) && /^[a-f0-9]{16}$/.test(e.data.version)) {
+		clientVersions.set(e.source.id, e.data.version);
+		e.waitUntil(cleanupObsoleteCaches().catch(console.warn));
+	}
 });
 
 self.addEventListener('activate', e => {
+	activeWorker = self.registration.active;
 	if (NATIVE_APP) {
 		e.waitUntil((async () => {
 			try {
@@ -42,18 +80,13 @@ self.addEventListener('activate', e => {
 		return;
 	}
 	e.waitUntil((async () => {
-		try {
-			for (const key of await caches.keys()) {
-				if (key === CACHE_NAME) continue;
-				if (key.startsWith(CACHE_NAMESPACE)) await caches.delete(key);
-				else if (key.startsWith('fend-')) {
-					// Legacy names had no scope. Only retire caches owned by this app.
-					const requests = await (await caches.open(key)).keys();
-					if (requests.length && requests.every(request => request.url.startsWith(self.registration.scope))) await caches.delete(key);
-				}
-			}
-		} catch (error) { console.warn('[sw] cache cleanup failed', error); }
 		await self.clients.claim();
+		try {
+			for (const client of await self.clients.matchAll({ type: 'window', includeUncontrolled: true })) {
+				if (client.url.startsWith(self.registration.scope)) client.postMessage({ type: 'FEND_REPORT_VERSION' });
+			}
+			await cleanupObsoleteCaches();
+		} catch (error) { console.warn('[sw] cache cleanup failed', error); }
 	})());
 });
 
@@ -66,6 +99,16 @@ self.addEventListener('fetch', e => {
 			cache = await caches.open(CACHE_NAME);
 			const cached = await cache.match(e.request, { ignoreSearch: e.request.mode === 'navigate' });
 			if (cached) return cached;
+			const relativePath = new URL(e.request.url).pathname.slice(new URL(self.registration.scope).pathname.length);
+			if (/^assets\/[a-f0-9]{16}\//.test(relativePath)) {
+				// Serve only an exact immutable asset URL from a retained graph. Older
+				// HTML is never substituted for a new navigation.
+				for (const key of await caches.keys()) {
+					if (key === CACHE_NAME || !await isAppCache(key)) continue;
+					const oldAsset = await (await caches.open(key)).match(e.request);
+					if (oldAsset) return oldAsset;
+				}
+			}
 		} catch (error) { console.warn('[sw] cache read failed', error); }
 		const controller = new AbortController();
 		const timer = setTimeout(() => controller.abort(), TIMEOUT);
