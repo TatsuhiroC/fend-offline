@@ -14,6 +14,58 @@ const appName = (await readdir(assets)).find(name => /^App-.*\.js$/.test(name));
 const app = await readFile(join(assets, appName), 'utf8');
 const rateRegion = app.match(/\/\/#region src\/lib\/exchange-rates\.ts\n([\s\S]*?)\/\/#endregion/)[1];
 
+test('published output omits duplicate snapshots, unused helpers and broken debug links', async () => {
+	assert.equal((await readdir('www')).includes('exchange-rates.xml'), false);
+	const sw = await readFile('www/sw.js', 'utf8');
+	assert.doesNotMatch(sw, /exchange-rates\.xml/);
+	assert.doesNotMatch(app, /\b(?:WaitGroup|abortPromise|BarsFade|ThreeDotsScaleMiddle)\b/);
+	for (const name of (await readdir(assets)).filter(name => name.endsWith('.js'))) {
+		assert.doesNotMatch(await readFile(join(assets, name), 'utf8'), /sourceMappingURL=/);
+	}
+	// The checked-in snapshot remains available for the next build/refresh.
+	assert.match(await readFile('exchange-rates.xml', 'utf8'), /UN_OPERATIONAL_RATES/);
+});
+
+test('retained loading animation renders exactly like the upstream component', async () => {
+	const upstream = await readFile(join('assets', appName), 'utf8');
+	const render = (source, props) => {
+		const start = source.indexOf('var import_dist = ');
+		const end = source.indexOf('\nfunction PendingOutput(', start);
+		const react = { createElement: (tag, attributes, ...children) => ({ tag, attributes, children }) };
+		const context = vm.createContext({
+			require_react: () => react,
+			__toESM: value => ({ default: value }),
+			__commonJSMin: callback => () => {
+				const module = { exports: {} };
+				callback(module.exports, module);
+				return module.exports;
+			}, props
+		});
+		vm.runInContext(source.slice(start, end), context);
+		return JSON.parse(vm.runInContext('JSON.stringify(import_dist.ThreeDotsScale(props))', context));
+	};
+	for (const props of [{}, { width: 40, height: 32, dur: '2s', color: '#123456' }]) {
+		assert.deepEqual(render(app, props), render(upstream, props));
+	}
+});
+
+test('cleanup rejects a changed upstream animation consumer before rewriting the app', async () => {
+	const dir = await mkdtemp(join(tmpdir(), 'fend-cleanup-'));
+	try {
+		await cp('assets', join(dir, 'assets'), { recursive: true });
+		await cp('exchange-rates.xml', join(dir, 'exchange-rates.xml'));
+		execFileSync(process.execPath, ['scripts/patch-rates.mjs', dir]);
+		const path = join(dir, 'assets', appName);
+		const source = await readFile(path, 'utf8');
+		for (const component of ['BarsFade', 'ThreeDotsScaleMiddle']) {
+			const changed = source.replace('import_dist.ThreeDotsScale,', `import_dist.${component},`);
+			await writeFile(path, changed);
+			assert.throws(() => execFileSync(process.execPath, ['scripts/patch-runtime.mjs', dir], { stdio: 'pipe' }), /spinner consumers changed/);
+			assert.equal(await readFile(path, 'utf8'), changed);
+		}
+	} finally { await rm(dir, { recursive: true, force: true }); }
+});
+
 function ratesContext(options = {}) {
 	const saved = new Map();
 	const context = vm.createContext({ AbortController, TextDecoder, setTimeout, clearTimeout,

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Inject network-first rates with a bundled offline fallback into build output.
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseSnapshot } from './snapshot-data.mjs';
@@ -29,3 +29,6 @@ for (const name of bundles) {
 	writeFileSync(file, patched);
 	console.log(`[rates] ${name}: embedded ${rates.size} currencies`);
 }
+// All runtime rates and their date are now embedded; retain the repository input,
+// but do not ship or precache a second copy in web/PWA/APK output.
+unlinkSync(join(dist, 'exchange-rates.xml'));
