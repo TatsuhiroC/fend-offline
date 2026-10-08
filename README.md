@@ -76,7 +76,7 @@ APK 使用保存在 GitHub Secrets 里的 keystore 签名；分支构建和正�
 
 The core [fend](https://github.com/printfn/fend) library is written in Rust and compiled to WebAssembly. This repo packages the pre-built WASM + a minimal React UI into a static site with a [Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) for offline caching. The Android APK is built automatically by [GitHub Actions](.github/workflows/build-apk.yml) using [Capacitor](https://capacitorjs.com).
 
-Web and PWA use the same network-first currency logic. A submitted currency calculation requests the latest USD-based data from [Currency API](https://github.com/fawazahmed0/exchange-api), using its jsDelivr endpoint and Cloudflare mirror. The complete request has a 3-second deadline. Valid responses are saved in browser storage; failed, slow or invalid responses use the last saved rates, or the bundled UN snapshot if no download has succeeded. The page shows the data date and whether online or fallback rates are in use. Currency API publishes daily data, not tick-by-tick trading quotes. Temperature, arithmetic and typing hints never wait for the rates request. Run `npm run rates:update` to refresh the built-in backup snapshot.
+Web and PWA use the same network-first currency logic. A submitted currency calculation requests the latest USD-based data from [Currency API](https://github.com/fawazahmed0/exchange-api), racing its jsDelivr endpoint and Cloudflare mirror in parallel. The complete request has a 15-second deadline; each mirror can use that entire window. Valid responses are saved in browser storage; failed, slow or invalid responses use the last saved rates, or the bundled UN snapshot if no download has succeeded. The page shows the data date, whether online or local fallback rates are in use, and whether an update is pending, timed out or unavailable. Currency API publishes daily data, not tick-by-tick trading quotes. Temperature, arithmetic and typing hints never wait for the rates request. A typed preview is recalculated when the background rate download succeeds. Run `npm run rates:update` to refresh the built-in backup snapshot.
 
 ### Development / 开发
 
@@ -95,7 +95,7 @@ The UI/WASM assets in `assets/` are the upstream [fend web build](https://github
 
 核心 [fend](https://github.com/printfn/fend) 库用 Rust 编写，编译为 WebAssembly。本仓库将预构建的 WASM 和一个轻量 React UI 打包为静态网站，通过 Service Worker 实现离线缓存。安卓 APK 由 [GitHub Actions](.github/workflows/build-apk.yml) 通过 [Capacitor](https://capacitorjs.com) 自动构建。
 
-普通网页和 PWA 使用同一套在线优先的汇率逻辑。提交货币计算时从 [Currency API](https://github.com/fawazahmed0/exchange-api) 读取最新的美元基准汇率，提供 jsDelivr 和 Cloudflare 两个入口，整个请求最多等待 3 秒。有效数据会保存在浏览器本地；断网、超时或返回无效数据时使用最近保存的汇率，没有保存记录才使用内置的联合国汇率快照。页面显示数据日期及在线／本地来源。这个在线源每日更新，不是秒级交易报价。温度、算术和输入提示不等待汇率请求。`npm run rates:update` 用于刷新内置备用快照。
+普通网页和 PWA 使用同一套在线优先的汇率逻辑。提交货币计算时从 [Currency API](https://github.com/fawazahmed0/exchange-api) 读取最新的美元基准汇率，同时尝试 jsDelivr 和 Cloudflare 两个入口，整个请求最多等待 15 秒，单个入口可使用完整等待窗口。有效数据会保存在浏览器本地；断网、超时或返回无效数据时使用最近保存的汇率，没有保存记录才使用内置的联合国汇率快照。页面显示数据日期及在线／本地来源，并标明正在更新、更新超时或获取失败。这个在线源每日更新，不是秒级交易报价。温度、算术和输入提示不等待汇率请求；后台下载成功后，正在输入的预览会自动重新计算。`npm run rates:update` 用于刷新内置备用快照。
 
 ### 开发
 
