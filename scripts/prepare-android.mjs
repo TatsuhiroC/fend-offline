@@ -63,15 +63,20 @@ let versionCode;
 if (refType === 'tag' && parseVersion(refName)) {
 	const v = parseVersion(refName);
 	versionName = v.clean;
-	versionCode = v.major * 10000 + v.minor * 100 + v.patch; // 1.0.1 -> 10001
 } else if (parseVersion(pkg.version) && Number.isFinite(runNumber)) {
-	// main-branch builds: monotonically increasing, clearly below the tag scheme
+	// Branch builds keep a descriptive name; both branches and tags share the
+	// same versionCode counter so a branch APK can upgrade an installed release.
 	const v = parseVersion(pkg.version);
 	versionName = `${v.clean}-dev.${runNumber}${sha ? `+${sha}` : ''}`;
-	versionCode = runNumber;
 } else {
 	versionName = undefined;
 	versionCode = undefined;
+}
+if (versionName !== undefined && Number.isSafeInteger(runNumber) && runNumber > 0) {
+	// Above previously shipped 1.x semver codes (v1.0.1 used 10001), with one
+	// monotonic Actions counter for every build of this workflow.
+	versionCode = 100000 + runNumber;
+	if (versionCode > 2100000000) fail('versionCode exceeds the Android limit');
 }
 
 // ---------------------------------------------------------------- injected gradle
