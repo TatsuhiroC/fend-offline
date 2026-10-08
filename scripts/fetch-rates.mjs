@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// Refresh the bundled exchange-rate snapshot (exchange-rates.xml).
+// Refresh the last-resort offline exchange-rate snapshot (exchange-rates.xml).
 //
 // Why a snapshot instead of calling the API from the browser: the upstream endpoint
 // https://fend.pr.workers.dev/exchange-rates answers with a fixed
 // `Access-Control-Allow-Origin: https://printfn.github.io`, so any other origin
 // (this PWA on *.github.io, or the APK on https://localhost) is blocked by CORS.
 // We therefore vendor the snapshot and let scripts/patch-rates.mjs embed it into
-// the built bundle, so calculations require no rates request at runtime.
+// the built bundle as a final fallback. Online calculations use Currency API.
 //
 // Usage: node scripts/fetch-rates.mjs
 //        npm run rates:update
