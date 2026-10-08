@@ -99,3 +99,27 @@ test('invalid exchange-rate snapshots fail the build', async () => {
 		assert.throws(() => execFileSync(process.execPath, ['scripts/patch-rates.mjs', dir], { stdio: 'pipe' }), /missing required currencies/);
 	} finally { await rm(dir, { recursive: true, force: true }); }
 });
+
+test('scheduled refresh saves changed rates and reports unchanged snapshots', async () => {
+	const dir = await mkdtemp(join(tmpdir(), 'fend-refresh-'));
+	try {
+		await mkdir(join(dir, 'scripts'));
+		await cp('scripts/fetch-rates.mjs', join(dir, 'scripts', 'fetch-rates.mjs'));
+		const snapshot = await readFile('exchange-rates.xml', 'utf8');
+		await writeFile(join(dir, 'incoming.xml'), snapshot);
+		// Stub only the network response; execute the real refresh script against its
+		// own temporary repo so the checked-in rate snapshot cannot be changed.
+		const stub = join(dir, 'fetch-stub.mjs');
+		await writeFile(stub, `import { readFile } from 'node:fs/promises';
+globalThis.fetch = async () => new Response(await readFile(new URL('./incoming.xml', import.meta.url)), { status: 200 });`);
+		const run = () => execFileSync(process.execPath, ['--import', stub, join(dir, 'scripts', 'fetch-rates.mjs')], { encoding: 'utf8' });
+		assert.match(run(), /\(updated\)/);
+		assert.equal(await readFile(join(dir, 'exchange-rates.xml'), 'utf8'), snapshot);
+		assert.match(run(), /\(unchanged\)/);
+		const next = snapshot.replace(/<rate>([^<]+)<\/rate>/, (_, rate) => `<rate>${Number(rate) + 1}</rate>`);
+		assert.notEqual(next, snapshot);
+		await writeFile(join(dir, 'incoming.xml'), next);
+		assert.match(run(), /\(updated\)/);
+		assert.equal(await readFile(join(dir, 'exchange-rates.xml'), 'utf8'), next);
+	} finally { await rm(dir, { recursive: true, force: true }); }
+});

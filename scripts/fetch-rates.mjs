@@ -5,8 +5,8 @@
 // https://fend.pr.workers.dev/exchange-rates answers with a fixed
 // `Access-Control-Allow-Origin: https://printfn.github.io`, so any other origin
 // (this PWA on *.github.io, or the APK on https://localhost) is blocked by CORS.
-// We therefore vendor the snapshot next to index.html and let scripts/patch-rates.mjs
-// rewrite the bundle to fetch it same-origin — which also makes rates work offline.
+// We therefore vendor the snapshot and let scripts/patch-rates.mjs embed it into
+// the built bundle, so calculations require no rates request at runtime.
 //
 // Usage: node scripts/fetch-rates.mjs
 //        npm run rates:update
@@ -33,6 +33,9 @@ const currencies = [...xml.matchAll(/<f_curr_code>([A-Z]{3})<\/f_curr_code>/g)].
 if (!xml.includes('<UN_OPERATIONAL_RATES>') || currencies.length < MIN_CURRENCIES) {
 	fail(`response does not look like the UN rates dataset (${currencies.length} currencies parsed)`);
 }
+
+const changed = !existsSync(TARGET) || readFileSync(TARGET, 'utf8') !== xml;
+if (changed) writeFileSync(TARGET, xml);
 
 // scripts/patch-sw.mjs derives the service-worker cache name from the built files, so a
 // refreshed snapshot reaches installed clients on their next visit without any bump here.
