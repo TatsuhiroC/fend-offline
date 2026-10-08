@@ -38,7 +38,21 @@ window.addEventListener('fend-rates', ({ detail }) => {
 	const labels = { online: 'Online rates', saved: 'Offline fallback · saved rates', bundled: 'Offline fallback · built-in rates' };
 	document.getElementById('rates-status').textContent = `${labels[detail.source]} · ${detail.date}`;
 });
-if ('serviceWorker' in navigator) {
+const nativeApp = Boolean(window.Capacitor?.isNativePlatform?.());
+if (nativeApp && 'serviceWorker' in navigator) {
+	// APK assets are already offline. Retire browser caches without touching saved
+	// rates in localStorage, so a new APK always uses its packaged frontend.
+	(async () => {
+		const registrations = await navigator.serviceWorker.getRegistrations();
+		await Promise.all(registrations.map(registration => registration.unregister()));
+		if ('caches' in window) {
+			const keys = await caches.keys();
+			await Promise.all(keys.filter(key => key.startsWith('fend-')).map(key => caches.delete(key)));
+		}
+		if (navigator.serviceWorker.controller) location.reload();
+	})().catch(console.warn);
+}
+if ('serviceWorker' in navigator && !nativeApp) {
 	let updating = false;
 	navigator.serviceWorker.addEventListener('controllerchange', () => {
 		if (updating) location.reload();

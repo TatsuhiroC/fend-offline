@@ -38,13 +38,13 @@ An offline-capable web app for [fend](https://github.com/printfn/fend), an arbit
 
 ## Android APK / 安卓安装包
 
-Download the latest APK from the [Releases](https://github.com/TatsuhiroC/fend-offline/releases) page and install it on your Android phone — no app store needed. All calculator resources are bundled inside the APK, so it works fully offline.
+Download the latest APK from the [Releases](https://github.com/TatsuhiroC/fend-offline/releases) page and install it on your Android phone. It contains the same calculator and network-first rates as the website. Calculator resources and backup rates are bundled for offline use. Website updates do not replace an installed APK: install a rebuilt package to get frontend changes. Saved online rates remain in app storage across an upgrade with the same app ID and signing certificate. The native app retires browser service-worker caches so they cannot override its packaged frontend.
 
-从 [Releases](https://github.com/TatsuhiroC/fend-offline/releases) 页面下载最新 APK，直接安装到安卓手机即可，无需应用商店。APK 内置全部计算资源，完全离线可用。
+从 [Releases](https://github.com/TatsuhiroC/fend-offline/releases) 页面下载最新 APK，直接安装到安卓手机。APK 与网页共用计算引擎和在线优先的汇率逻辑，并内置计算资源及备用汇率，断网也能使用。网页更新不会替换已安装 APK 的程序代码，需要安装重新构建的包。使用相同应用 ID 和签名覆盖安装时，已保存的在线汇率会保留。原生应用会停用并清理旧网页缓存，避免旧缓存覆盖新安装包的内容。
 
 ### APK signing / APK 签名
 
-APKs are signed with a keystore kept in GitHub Secrets, so each release installs **over** the previous one. Add these four secrets under **Settings → Secrets and variables → Actions** (or run `bash scripts/make-keystore.sh`, which generates the keystore and prints every value):
+APKs are signed with a keystore kept in GitHub Secrets. Branch and tagged builds share an increasing Android versionCode, so a newer package signed with the same certificate installs **over** the previous one. Add these four secrets under **Settings → Secrets and variables → Actions** (or run `bash scripts/make-keystore.sh`, which generates the keystore and prints every value):
 
 | Secret | Value |
 | --- | --- |
@@ -59,7 +59,7 @@ Keep the keystore file itself backed up: if it is lost, existing installs can on
 
 ---
 
-APK 使用保存在 GitHub Secrets 里的 keystore 签名，因此新版本可以直接覆盖安装旧版本。在 **Settings → Secrets and variables → Actions** 里添加以下四个 secret（也可以直接运行 `bash scripts/make-keystore.sh`，它会生成 keystore 并打印所有需要填的值）：
+APK 使用保存在 GitHub Secrets 里的 keystore 签名；分支构建和正式版本共用递增的安卓版本号，因此签名一致的新包可以覆盖安装旧版本。在 **Settings → Secrets and variables → Actions** 里添加以下四个 secret（也可以直接运行 `bash scripts/make-keystore.sh`，它会生成 keystore 并打印所有需要填的值）：
 
 | Secret | 内容 |
 | --- | --- |

@@ -6,7 +6,7 @@
 	"scripts": {
 		"build:web": "rm -rf www && mkdir -p www && cp index.html manifest.json sw.js icon-192.png icon-512.png icon-maskable-512.png exchange-rates.xml www/ && cp -r assets www/ && node scripts/patch-rates.mjs www && node scripts/patch-runtime.mjs www && node scripts/version-assets.mjs www && node scripts/patch-sw.mjs www",
 		"rates:update": "node scripts/fetch-rates.mjs",
-		"test:web": "npm run build:web && node --test tests/pwa.test.mjs",
+		"test:web": "npm run build:web && node --test tests/*.test.mjs",
 		"android:keystore": "bash scripts/make-keystore.sh"
 	},
 	"devDependencies": {
