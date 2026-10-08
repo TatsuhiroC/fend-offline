@@ -44,7 +44,7 @@ Download the latest APK from the [Releases](https://github.com/TatsuhiroC/fend-o
 
 ### APK signing / APK 签名
 
-APKs are signed with a keystore kept in GitHub Secrets. Branch and tagged builds share an increasing Android versionCode, so a newer package signed with the same certificate installs **over** the previous one. Add these four secrets under **Settings → Secrets and variables → Actions** (or run `bash scripts/make-keystore.sh`, which generates the keystore and prints every value):
+APKs are signed with a keystore kept in GitHub Secrets. Branch and tagged builds share an increasing Android versionCode, so a newer package signed with the same certificate installs **over** the previous one. Add these four secrets under **Settings → Secrets and variables → Actions** (or run `bash scripts/make-keystore.sh`, which saves a new keystore and owner-only secret files under `.signing/`, without printing credentials):
 
 | Secret | Value |
 | --- | --- |
@@ -55,11 +55,11 @@ APKs are signed with a keystore kept in GitHub Secrets. Branch and tagged builds
 
 Optionally set `ANDROID_CERT_SHA256` to the keystore's SHA-256 fingerprint (colons included) and CI will refuse to publish an APK signed with anything else.
 
-Keep the keystore file itself backed up: if it is lost, existing installs can only be updated by uninstalling the app first. Without the secrets the workflow still runs, but falls back to a **debug** APK — every runner generates a fresh debug key, so users have to uninstall before installing the next build.
+Keep the keystore file itself backed up: if it is lost, existing installs can only be updated by uninstalling the app first. Tagged releases require all four secrets and fail if any are missing. Branch builds without the secrets fall back to a **debug** APK — every runner generates a fresh debug key, so users have to uninstall before installing the next build.
 
 ---
 
-APK 使用保存在 GitHub Secrets 里的 keystore 签名；分支构建和正式版本共用递增的安卓版本号，因此签名一致的新包可以覆盖安装旧版本。在 **Settings → Secrets and variables → Actions** 里添加以下四个 secret（也可以直接运行 `bash scripts/make-keystore.sh`，它会生成 keystore 并打印所有需要填的值）：
+APK 使用保存在 GitHub Secrets 里的 keystore 签名；分支构建和正式版本共用递增的安卓版本号，因此签名一致的新包可以覆盖安装旧版本。在 **Settings → Secrets and variables → Actions** 里添加以下四个 secret（也可以直接运行 `bash scripts/make-keystore.sh`，它会把新 keystore 和仅本人可读的 secret 文件保存在 `.signing/`，不会打印密码或密钥内容）：
 
 | Secret | 内容 |
 | --- | --- |
@@ -70,7 +70,7 @@ APK 使用保存在 GitHub Secrets 里的 keystore 签名；分支构建和正�
 
 可选：把 keystore 的 SHA-256 指纹（带冒号）填到 `ANDROID_CERT_SHA256`，CI 就会拒绝发布用其他密钥签名的 APK。
 
-请务必备份 keystore 文件本身：一旦丢失，已安装的用户只能先卸载才能升级。没有配置这些 secret 时 workflow 仍会运行，但会退回到 **debug** APK——每个 runner 都会重新生成一个 debug 密钥，用户必须先卸载才能安装下一个版本。
+请务必备份 keystore 文件本身：一旦丢失，已安装的用户只能先卸载才能升级。正式版本缺少任何签名 secret 时会停止构建；分支构建未配置这些 secret 时会退回到 **debug** APK——每个 runner 都会重新生成一个 debug 密钥，用户必须先卸载才能安装下一个版本。
 
 ## How it works / 原理
 
@@ -85,7 +85,7 @@ npm install                 # Capacitor toolchain (only needed for the APK)
 npm run build:web           # builds versioned assets with bundled rates in www/
 npm run test:web            # checks network/fallback rates, calculations and worker recovery
 npm run rates:update        # refresh exchange-rates.xml (+ bumps the SW cache)
-npm run android:keystore    # generate the release keystore and print the CI secrets
+npm run android:keystore    # generate a new key and save owner-only secret files
 npx cap add android && cd android && ./gradlew assembleDebug   # local APK
 ```
 
@@ -104,7 +104,7 @@ npm install                 # Capacitor 工具链（仅构建 APK 时需要）
 npm run build:web           # 在 www/ 构建带版本地址和内置汇率的程序
 npm run test:web            # 验证在线／本地汇率、计算和引擎故障恢复
 npm run rates:update        # 刷新 exchange-rates.xml（并自动 bump SW 缓存版本）
-npm run android:keystore    # 生成签名用 keystore 并打印 CI secrets
+npm run android:keystore    # 生成新签名密钥及仅本人可读的 secret 文件
 npx cap add android && cd android && ./gradlew assembleDebug   # 本地构建 APK
 ```
 
@@ -117,3 +117,20 @@ npx cap add android && cd android && ./gradlew assembleDebug   # 本地构建 AP
 
 - 计算引擎：[printfn/fend](https://github.com/printfn/fend)（MIT 许可证）
 - 本仓库仅包含预构建的 Web 前端
+
+For existing releases, retain the original signing key; do not generate a replacement.
+The key helper displays upload commands that read the private files via stdin. Run these
+only when configuring a new project, and back up the key and credentials securely.
+
+已有安装包请继续使用原签名密钥，不要重新生成替代密钥。辅助脚本仅显示从私密文件读取内容的上传命令；
+只有新项目首次配置时才需要运行，并请安全备份密钥和密码。
+
+Runtime safeguards handle malformed/blocked history storage, worker startup failures,
+superseded calculations, rate-response size limits and scoped PWA caches. Pull requests
+run calculator regression tests and an npm dependency audit. Android builds use read-only
+repository credentials; tagged-release publishing runs in a separate job.
+
+运行时会处理历史记录损坏、存储受限、计算引擎启动失败、重复提交，以及过大的汇率响应。
+PWA 缓存按应用路径隔离。PR 会运行计算回归测试和依赖漏洞检查，APK 构建与正式发布使用不同权限。
+
+Bundled frontend licenses are preserved in [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt), included in web and APK output.
