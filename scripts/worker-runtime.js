@@ -83,12 +83,13 @@ async function fend(input, timeout, variables, freshRates = true) {
 		if (freshRates && generation !== evaluationGeneration) return { ok: false, message: 'cancelled' };
 		let result = await query(args);
 		if (freshRates && generation !== evaluationGeneration) return { ok: false, message: 'cancelled' };
-		if (freshRates && usesCurrency(input, result)) {
+		if (freshRates && usesCurrency(input, result, variables)) {
 			args.currencyData = await refreshExchangeRates();
 			if (generation !== evaluationGeneration) return { ok: false, message: 'cancelled' };
 			result = await query(args);
 		}
 		if (freshRates && generation !== evaluationGeneration) return { ok: false, message: 'cancelled' };
+		if (freshRates && typeof rememberCurrencyBindings === 'function') rememberCurrencyBindings(input, variables, result);
 		return result;
 	} catch (error) {
 		if (error?.name === 'AbortError') return { ok: false, message: 'cancelled' };
