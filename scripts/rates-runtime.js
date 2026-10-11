@@ -77,13 +77,93 @@ async function readCurrencyResponse(response) {
 	} finally { void reader.cancel().catch(() => {}); }
 }
 
-function usesCurrency(input, result) {
-	const text = input + ' ' + (result.ok ? result.result : result.message);
-	const codes = text.match(/\b[A-Za-z]{3}\b/g) || [];
+// Read only the lexical cues needed for rates, without treating string contents
+// as units. Quotes following numbers/to are fend's feet/inches units, not strings.
+function currencyTokens(input) {
+	const tokens = [];
+	let remaining = input;
+	while (remaining) {
+		const whitespace = /^\s+/.exec(remaining);
+		if (whitespace) { remaining = remaining.slice(whitespace[0].length); continue; }
+		if (/^#(?: |!)/.test(remaining)) {
+			const end = remaining.indexOf('\n');
+			remaining = end < 0 ? '' : remaining.slice(end + 1);
+			continue;
+		}
+		if (remaining.startsWith('#"')) {
+			const end = remaining.indexOf('"#', 2);
+			tokens.push({ value: '', type: 'string' });
+			remaining = end < 0 ? '' : remaining.slice(end + 2);
+			continue;
+		}
+		const quote = remaining[0];
+		const previous = tokens[tokens.length - 1];
+		if ((quote === '"' || quote === "'") && previous?.type !== 'number' && !['to', 'as', 'in'].includes(previous?.value)) {
+			let end = 1;
+			while (end < remaining.length) {
+				if (remaining[end] === '\\') { end += 2; continue; }
+				if (remaining[end++] === quote) break;
+			}
+			tokens.push({ value: '', type: 'string' });
+			remaining = remaining.slice(end);
+			continue;
+		}
+		const number = /^(?:0[xob][0-9a-f]+|\d[\d_,]*(?:\.\d+)?(?:[eE][+-]?\d+)?|\.\d+)/i.exec(remaining);
+		const word = /^[\p{L}_$€£¥₹₩₽₺][\p{L}\p{N}_.$€£¥₹₩₽₺]*/u.exec(remaining);
+		const value = number?.[0] ?? word?.[0] ?? /^(?:==|=>|!=)/.exec(remaining)?.[0] ?? remaining[0];
+		tokens.push({ value, type: number ? 'number' : word ? 'word' : 'symbol' });
+		remaining = remaining.slice(value.length);
+	}
+	return tokens;
+}
+
+function isCurrencyToken(code) {
 	// fend resolves lower-case `cup` as a volume unit; CUP/Cup are currency.
 	// Plain pound/pounds are mass units; GBP, £ and sterling denote currency.
-	return codes.some(code => code !== 'cup' && (bundledExchangeRates.has(code.toUpperCase()) || ['BTC', 'ETH', 'XAU', 'XAG'].includes(code.toUpperCase()))) ||
-		/[$€£¥₹₩₽]|\b(currency|currencies|dollars?|cents?|euros?|sterling|yuans?|renminbi|rmb|francs?|yen|rupees?|r[ou]+bles?|won|pesos?|dirhams?|riyals?|dinars?|krona|kroner|shillings?|liras?|reais|baht|ringgit)\b/i.test(text);
+	return code !== 'cup' && (bundledExchangeRates.has(code.toUpperCase()) || ['BTC', 'ETH', 'XAU', 'XAG'].includes(code.toUpperCase()) || ['zł', 'zl', 'TL'].includes(code)) ||
+		/[$€£¥₹₩₽₺]/.test(code) || /^(?:dollars?|cents?|euros?|sterling|yuans?|renminbi|rmb|francs?|yen|rupees?|r[ou]+bles?|won|pesos?|dirhams?|riyals?|dinars?|krona|kroner|shillings?|liras?|reais|baht|ringgit)$/i.test(code);
+}
+
+// These small snapshots track names we have observed, never decode the engine's
+// private variable format. Keep adjacent states for React's pending transitions.
+var currencyBindings = new Map();
+function stringBinding(tokens, index, bindings) {
+	while (tokens[index]?.value === '(') index++;
+	return tokens[index]?.type === 'string' || bindings.get(tokens[index]?.value) === true;
+}
+function bindingsAfterInput(input, variables) {
+	const bindings = new Map(currencyBindings.get(variables));
+	const tokens = currencyTokens(input);
+	for (let i = 0; i < tokens.length; i++) {
+		if ((i === 0 || tokens[i - 1].value === ';') && tokens[i].type === 'word' && tokens[i + 1]?.value === '=') {
+			bindings.set(tokens[i].value, stringBinding(tokens, i + 2, bindings));
+		}
+	}
+	return bindings;
+}
+function rememberCurrencyBindings(input, variables, result) {
+	if (!result.ok || !result.variables) return;
+	const bindings = bindingsAfterInput(input, variables);
+	currencyBindings.delete(result.variables);
+	currencyBindings.set(result.variables, bindings);
+	while (currencyBindings.size > 3) currencyBindings.delete(currencyBindings.keys().next().value);
+}
+function usesCurrency(input, result, variables = '') {
+	const bindings = new Map(currencyBindings.get(variables));
+	const tokens = currencyTokens(input);
+	let hasString = false;
+	for (let i = 0; i < tokens.length; i++) {
+		const token = tokens[i];
+		if (token.value === ';') hasString = false;
+		if (token.type === 'string' || bindings.get(token.value) === true) hasString = true;
+		if (token.type !== 'word') continue;
+		if (tokens[i + 1]?.value === '=') { bindings.set(token.value, stringBinding(tokens, i + 2, bindings)); continue; }
+		if (!bindings.has(token.value) && isCurrencyToken(token.value)) return true;
+	}
+	if (!result.ok) return /currency exchange rate|exchange rates/i.test(result.message);
+	// Monetary variables can introduce units absent from the input. String output
+	// is intentionally not inspected: it is not a currency expression.
+	return !hasString && currencyTokens(result.result).some(token => token.type === 'word' && isCurrencyToken(token.value));
 }
 
 async function refreshExchangeRates() {

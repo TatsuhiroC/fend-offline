@@ -78,6 +78,8 @@ The core [fend](https://github.com/printfn/fend) library is written in Rust and 
 
 Web and PWA use the same network-first currency logic. A submitted currency calculation requests the latest USD-based data from [Currency API](https://github.com/fawazahmed0/exchange-api), racing its jsDelivr endpoint and Cloudflare mirror in parallel. The complete request has a 15-second deadline; each mirror can use that entire window. Valid responses are saved in browser storage; failed, slow or invalid responses use the last saved rates, or the bundled UN snapshot if no download has succeeded. The page shows the data date, whether online or local fallback rates are in use, and whether an update is pending, timed out or unavailable. Currency API publishes daily data, not tick-by-tick trading quotes. Temperature, arithmetic and typing hints never wait for the rates request. Plain `cup` and `pounds` are ordinary volume/mass units; `CUP` and `GBP` denote currencies. A typed preview is recalculated when the background rate download succeeds. Run `npm run rates:update` to refresh the built-in backup snapshot.
 
+Currency aliases such as `100 zł to TL` and `100 zl to ₺` also refresh online rates. Quoted strings, comments and ordinary assigned variables such as `try = 2` do not trigger a currency download. Confirming an input-method candidate does not submit the calculator. If you type the next expression while a calculation is pending, its preview resumes after that calculation finishes.
+
 Known engine limitation: a non-USD currency amount stored in a variable, such as `x = 100 CNY`, retains the assignment-time conversion factor in the current WASM engine. Downloading new rates does not update that factor. For a fresh conversion, enter the amount directly (`100 CNY to USD`) or reassign the variable after the rate update. The online status describes the downloaded dataset; it does not guarantee that an existing monetary variable has been revalued.
 
 ### Development / 开发
@@ -98,6 +100,8 @@ The UI/WASM assets in `assets/` are the upstream [fend web build](https://github
 核心 [fend](https://github.com/printfn/fend) 库用 Rust 编写，编译为 WebAssembly。本仓库将预构建的 WASM 和一个轻量 React UI 打包为静态网站，通过 Service Worker 实现离线缓存。安卓 APK 由 [GitHub Actions](.github/workflows/build-apk.yml) 通过 [Capacitor](https://capacitorjs.com) 自动构建。
 
 普通网页和 PWA 使用同一套在线优先的汇率逻辑。提交货币计算时从 [Currency API](https://github.com/fawazahmed0/exchange-api) 读取最新的美元基准汇率，同时尝试 jsDelivr 和 Cloudflare 两个入口，整个请求最多等待 15 秒，单个入口可使用完整等待窗口。有效数据会保存在浏览器本地；断网、超时或返回无效数据时使用最近保存的汇率，没有保存记录才使用内置的联合国汇率快照。页面显示数据日期及在线／本地来源，并标明正在更新、更新超时或获取失败。这个在线源每日更新，不是秒级交易报价。温度、算术和输入提示不等待汇率请求；普通的 `cup`、`pounds` 是容量和重量单位，`CUP`、`GBP` 才表示货币。后台下载成功后，正在输入的预览会自动重新计算。`npm run rates:update` 用于刷新内置备用快照。
+
+`100 zł to TL`、`100 zl to ₺` 等货币别名也会刷新在线汇率。引号里的字符串、注释以及 `try = 2` 这样的普通变量赋值不会触发汇率下载。输入法确认候选字时不会提交公式；计算等待期间输入的下一条公式，会在当前计算完成后恢复预览。
 
 已知引擎限制：当前 WASM 引擎会在金额变量中保留赋值时的换算比例，例如 `x = 100 CNY`。下载新汇率不会更新这个比例。需要按新汇率换算时，请直接输入金额（如 `100 CNY to USD`），或在汇率更新后重新赋值。顶部的在线状态描述下载的数据，并不保证已有金额变量也已按新汇率重估。
 
