@@ -37,7 +37,7 @@
 
 | 设备 | 使用方式 |
 | --- | --- |
-| 电脑 | [打开网页](https://tatsuhiroc.github.io/fend-offline/)，直接输入公式。 |
+| 电脑 | 用 Chrome [打开网页](https://tatsuhiroc.github.io/fend-offline/)，点击 **Install（安装）** 按钮安装网页应用，首次加载并完成缓存后即可离线使用。 |
 | iPhone / iPad | 用 Safari 打开网页，点 **分享 → 添加到主屏幕**。 |
 | Android | [下载最新 APK](https://github.com/TatsuhiroC/fend-offline/releases/latest)，或通过浏览器菜单安装网页应用。 |
 

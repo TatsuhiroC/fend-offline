@@ -37,7 +37,7 @@ Press **Enter** to calculate. See the [fend documentation](https://printfn.githu
 
 | Device | How to use it |
 | --- | --- |
-| Computer | [Open the website](https://tatsuhiroc.github.io/fend-offline/) and type an expression. |
+| Computer | [Open the website](https://tatsuhiroc.github.io/fend-offline/) in Chrome and click **Install** to install the web app. Use it offline after the first load and completed caching. |
 | iPhone / iPad | Open it in Safari, then choose **Share → Add to Home Screen**. |
 | Android | [Download the latest APK](https://github.com/TatsuhiroC/fend-offline/releases/latest), or install the web app from your browser menu. |
 
