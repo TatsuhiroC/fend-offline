@@ -62,16 +62,20 @@ test('real currency aliases refresh online rates on each submitted conversion', 
 
 test('strings, comments and ordinary variables never wait for unavailable online rates', async () => {
  const calc = await calculator();
- calc.context.fetch = async () => assert.fail('ordinary input must not request rates');
+ let unwantedRequests = 0;
+ calc.context.fetch = async () => {unwantedRequests++; throw new Error('offline');};
  try {
   for (const [input,expected] of [
-   ['"USD"','USD'], ["'100 USD'",'100 USD'], ['#"USD \" TL"#','USD " TL'],
+   ['"USD"','USD'], ['ans','USD'], ["'100 USD'",'100 USD'], ['#"USD \" TL"#','USD " TL'],
    ['try = 2','2'], ['try + 1','3'], ['USD = 4','4'], ['100 USD','400'],
    ['x = "100 USD"','100 USD'], ['x','100 USD'], ['y = x','100 USD'], ['y','100 USD'],
    ['z = (("USD"))','USD'], ['z','USD'],
    ['1 + 1 # USD TL','2'], ['1 + 1 #! 100 EUR','2'], ["5'10\" to cm",'177.8 cm'],
    ['1 cup to ml','236.5882365 ml'], ['10 pounds to kg','4.5359237 kg']
-  ]) assert.equal((await calc.run(input)).result,expected,input);
+  ]) {
+   assert.equal((await calc.run(input)).result,expected,input);
+   assert.equal(unwantedRequests,0,input + ' must not request rates');
+  }
  } finally {await calc.close();}
 });
 
@@ -80,6 +84,7 @@ test('monetary variables and comparisons still refresh, and previews do not chan
  try {
   assert.equal((await calc.run('amount = 100 USD')).requests,2);
   assert.equal((await calc.run('amount')).requests,2);
+  assert.equal((await calc.run('ans')).requests,2,'a monetary ans still needs online rates');
   assert.equal((await calc.run('"USD"; amount')).requests,2,'an earlier string must not hide a monetary result');
   assert.equal((await calc.run('amount to CNY')).result,'750 CNY');
   assert.equal((await calc.run('1 USD == 1 CNY')).requests,2,'equality is not assignment');

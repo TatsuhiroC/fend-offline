@@ -144,6 +144,12 @@ function bindingsAfterInput(input, variables) {
 function rememberCurrencyBindings(input, variables, result) {
 	if (!result.ok || !result.variables) return;
 	const bindings = bindingsAfterInput(input, variables);
+	if (result.result) {
+		const tokens = currencyTokens(input);
+		let lastStatement = 0;
+		for (let i = 0; i < tokens.length; i++) if (tokens[i].value === ';') lastStatement = i + 1;
+		bindings.set('ans', stringBinding(tokens, lastStatement, bindings));
+	}
 	currencyBindings.delete(result.variables);
 	currencyBindings.set(result.variables, bindings);
 	while (currencyBindings.size > 3) currencyBindings.delete(currencyBindings.keys().next().value);
