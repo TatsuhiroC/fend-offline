@@ -291,11 +291,11 @@ test('online rate updates refresh typed hints without overwriting newer input or
  const context = vm.createContext({
   import_react: {
    useRef: value => { const ref = { current: value }; refs.push(ref); return ref; },
-   useEffect: effect => { cleanup = effect(); },
+   useEffect: effect => { const dispose = effect(); if (dispose) cleanup = dispose; },
    startTransition: callback => transitions.push(callback())
   },
   window: { addEventListener: (name, handler) => handlers.set(name, handler), removeEventListener: name => handlers.delete(name) },
-  submittedQueries: 0, setHint: value => hints.push(value),
+  submittedQueries: 0, inputPending: true, setHint: value => hints.push(value),
   evaluateHint: value => new Promise(resolve => { finishHint = resolve; })
  });
  vm.runInContext(await readFile('scripts/hint-runtime.js', 'utf8'), context);
@@ -315,4 +315,60 @@ test('online rate updates refresh typed hints without overwriting newer input or
  update({ source: 'online', refreshing: false });
  assert.equal(transitions.length, 2);
  cleanup(); assert.equal(handlers.size, 0);
+});
+
+test('committed submissions restore the current preview with committed variables and discard stale replies', async () => {
+ const refs = [], effects = [], transitions = [], hints = [];
+ let finish;
+ const context = vm.createContext({
+  import_react: {
+   useRef: value => { const ref = {current:value}; refs.push(ref); return ref; },
+   useEffect: callback => effects.push(callback),
+   startTransition: callback => transitions.push(callback())
+  },
+  window: {addEventListener() {}, removeEventListener() {}},
+  submittedQueries: 1, inputPending: true,
+  evaluateHint: value => new Promise(resolve => { finish = resolve; }),
+  setHint: value => hints.push(value)
+ });
+ vm.runInContext(await readFile('scripts/hint-runtime.js', 'utf8'), context);
+ refs[0].current = 'x + 1';
+ effects[1]();
+ assert.equal(transitions.length, 0, 'a pending submission must retain its worker');
+ context.submittedQueries = 0;
+ effects[1]();
+ assert.equal(transitions.length, 0, 'wait for the React transition to commit variables');
+ context.inputPending = false;
+ effects[1]();
+ finish('3'); await transitions.at(-1);
+ assert.deepEqual(hints, ['3']);
+ effects[1]();
+ refs[0].current = 'x + 2'; refs[1].current++;
+ finish('old result'); await transitions.at(-1);
+ assert.deepEqual(hints, ['3']);
+ refs[0].current = '';
+ effects[1]();
+ assert.equal(transitions.length, 2, 'cleared input must not restart a preview');
+});
+
+test('IME confirmation keys do not submit or clear input, while a normal Enter still submits', async () => {
+ const handler = app.match(/t3 = \(event\) => \{([\s\S]*?)\n\t\t\};\n\t\t\$\[2\]/)[1];
+ let submitted = 0, cleared = 0, prevented = 0, output = 0;
+ const actions = [];
+ const context = vm.createContext({
+  currentInput:'1 + 3', upArrow() {assert.fail('IME must not navigate');}, downArrow() {},
+  cancelCalculations() {assert.fail('IME must not cancel');},
+  submit:() => submitted++, onInput:() => cleared++, evaluate:async () => ({ok:true,result:'4'}),
+  startTransition:callback => actions.push(callback()), setOutput:() => output++,
+  import_jsx_runtime:{jsx:(type,props) => ({type,props}),jsxs:(type,props) => ({type,props}),Fragment:'fragment'},
+  pendingOutput:{current:null}, setTimeout:callback => callback()
+ });
+ const run = vm.runInContext('(event) => {' + handler + '}', context);
+ for (const nativeEvent of [{isComposing:true,keyCode:13},{isComposing:false,keyCode:229}]) {
+  run({key:'Enter',nativeEvent,preventDefault:() => prevented++});
+ }
+ assert.equal(submitted + cleared + prevented + output, 0);
+ run({key:'Enter',nativeEvent:{isComposing:false,keyCode:13},preventDefault:() => prevented++});
+ await Promise.all(actions);
+ assert.equal(submitted,1); assert.equal(cleared,1); assert.equal(prevented,1); assert.equal(output,1);
 });

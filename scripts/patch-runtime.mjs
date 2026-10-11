@@ -10,6 +10,12 @@ const hintRuntime = readFileSync(fileURLToPath(new URL('./hint-runtime.js', impo
 const hintState = 'const [hint, setHint] = (0, import_react.useState)("");';
 const hintInput = 'setCurrentInputInternal(value);';
 const hintResult = 'setHint(await evaluateHint(value));';
+const inputHook = 'function useCurrentInput(evaluateHint) {';
+const inputCall = 'const { currentInput, submit, onInput, upArrow, downArrow, hint } = useCurrentInput(evaluateHint);';
+const pendingState = 'const [isPending, startTransition] = (0, import_react.useTransition)();';
+const pendingBlock = pendingState + '\n\tlet t3;';
+const keyHandler = 't3 = (event) => {';
+const resultLog = 'console.log(result);';
 const workerRegion = /\/\/#region src\/lib\/fend\.ts\n[\s\S]*?(?=\/\/#endregion)/;
 const history = 'var initialHistory = JSON.parse(localStorage.getItem("fend_history") || "[]");';
 const saveHistory = 'localStorage.setItem("fend_history", JSON.stringify(updatedHistory.slice(-100)));';
@@ -46,7 +52,7 @@ function pruneUnusedRuntime(source) {
 for (const name of bundles) {
 	const file = join(assets, name);
 	const source = readFileSync(file, 'utf8');
-	if (!workerRegion.test(source) || ![history, saveHistory, oldSubmit, clear, historyLimit, historyReturn, hintState, hintInput, hintResult, 'setOutput(null);'].every(marker => source.includes(marker))) {
+	if (!workerRegion.test(source) || ![history, saveHistory, oldSubmit, clear, historyLimit, historyReturn, hintState, hintInput, hintResult, inputHook, inputCall, pendingBlock, keyHandler, resultLog, 'setOutput(null);'].every(marker => source.includes(marker))) {
 		throw new Error(`[runtime] upstream runtime/history/UI changed in ${name}`);
 	}
 	const patched = source.replace(workerRegion, () => `//#region src/lib/fend.ts\n${runtime}\n`)
@@ -57,6 +63,11 @@ for (const name of bundles) {
 	} catch { return []; }
 })();`)
 		.replace(hintState, () => hintState + '\n' + hintRuntime)
+		.replace(inputHook, 'function useCurrentInput(evaluateHint, inputPending) {')
+		.replace(inputCall, pendingState + '\n\t' + inputCall.replace('useCurrentInput(evaluateHint)', 'useCurrentInput(evaluateHint, isPending)'))
+		.replace(pendingBlock, 'let t3;')
+		.replace(keyHandler, keyHandler + '\n\t\t\t\tif (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) return;')
+		.replace(resultLog, '')
 		.replace(hintInput, 'hintInputRef.current = value;\n\t\t\tconst hintVersion = ++hintVersionRef.current;\n\t\t\t' + hintInput)
 		.replace(hintResult, 'const evaluatedHint = await evaluateHint(value);\n\t\t\t\tif (hintVersion === hintVersionRef.current) setHint(evaluatedHint);')
 		.replace(saveHistory, 'try { localStorage.setItem("fend_history", JSON.stringify(updatedHistory.slice(-100))); } catch {}')
