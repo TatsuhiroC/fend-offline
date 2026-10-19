@@ -7,6 +7,9 @@ import { fileURLToPath } from 'node:url';
 const assets = join(process.argv[2] ?? 'www', 'assets');
 const runtime = readFileSync(fileURLToPath(new URL('./worker-runtime.js', import.meta.url)), 'utf8');
 const hintRuntime = readFileSync(fileURLToPath(new URL('./hint-runtime.js', import.meta.url)), 'utf8');
+const historyRecallRuntime = readFileSync(fileURLToPath(new URL('./history-recall-runtime.js', import.meta.url)), 'utf8');
+const inputRef = 'const inputText = (0, import_react.useRef)(null);';
+const submittedFormula = 'const request = /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: `> ${currentInput}` });';
 const hintState = 'const [hint, setHint] = (0, import_react.useState)("");';
 const hintInput = 'setCurrentInputInternal(value);';
 const hintResult = 'setHint(await evaluateHint(value));';
@@ -52,7 +55,7 @@ function pruneUnusedRuntime(source) {
 for (const name of bundles) {
 	const file = join(assets, name);
 	const source = readFileSync(file, 'utf8');
-	if (!workerRegion.test(source) || ![history, saveHistory, oldSubmit, clear, historyLimit, historyReturn, hintState, hintInput, hintResult, inputHook, inputCall, pendingBlock, keyHandler, resultLog, 'setOutput(null);'].every(marker => source.includes(marker))) {
+	if (!workerRegion.test(source) || ![history, saveHistory, oldSubmit, clear, historyLimit, historyReturn, hintState, hintInput, hintResult, inputHook, inputCall, pendingBlock, keyHandler, resultLog, inputRef, submittedFormula, 'setOutput(null);'].every(marker => source.includes(marker))) {
 		throw new Error(`[runtime] upstream runtime/history/UI changed in ${name}`);
 	}
 	const patched = source.replace(workerRegion, () => `//#region src/lib/fend.ts\n${runtime}\n`)
@@ -63,6 +66,8 @@ for (const name of bundles) {
 	} catch { return []; }
 })();`)
 		.replace(hintState, () => hintState + '\n' + hintRuntime)
+		.replace(inputRef, () => inputRef + '\n' + historyRecallRuntime)
+		.replace(submittedFormula, 'const request = /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { role: "button", tabIndex: 0, "aria-label": `Edit formula: ${currentInput}`, "data-fend-input": currentInput, children: `> ${currentInput}` });')
 		.replace(inputHook, 'function useCurrentInput(evaluateHint, inputPending) {')
 		.replace(inputCall, pendingState + '\n\t' + inputCall.replace('useCurrentInput(evaluateHint)', 'useCurrentInput(evaluateHint, isPending)'))
 		.replace(pendingBlock, 'let t3;')

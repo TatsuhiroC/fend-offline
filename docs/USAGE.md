@@ -6,6 +6,8 @@
 
 写好公式后按 Enter。输入过程中会显示预览；按 ↑ / ↓ 可以找回之前的输入，输入 `clear` 并回车可以清空屏幕。
 
+在手机或电脑上，点击任意一条已经计算过的公式，就会将原公式填回输入框。修改后按 Enter 重新计算。长按或拖动仍可选择文字进行复制。
+
 单位也参与运算。例如：
 
 ```text
@@ -51,6 +53,7 @@
 ## English summary
 
 - Press Enter to calculate, ↑ / ↓ to recall inputs, or submit `clear` to clear the screen. Use parentheses around a compound denominator; `100 N / (9.8 m/s^2) to kg` calculates mass.
+- Tap or click a previously submitted formula to load it into the input for editing, then press Enter to calculate. Text selection and copying remain available.
 - The web app works offline after completed caching. Tap the PWA update prompt, or close all calculator windows and reopen online. Clearing site data removes cached resources and saved rates.
 - Download a new APK from [Releases](https://github.com/TatsuhiroC/fend-offline/releases/latest) to update Android. Official releases keep the same package and signing certificate for upgrades.
 - A submitted currency calculation requests daily [Currency API](https://github.com/fawazahmed0/exchange-api) data through jsDelivr and Cloudflare. Failed requests use the last saved rates, then a bundled snapshot. Read the source and date in the header; offline data can be a month old if that was the last successful download.
