@@ -367,7 +367,7 @@ test('timeouts abort all mirrors, identify local fallback and allow a fresh requ
  await context.refreshExchangeRates();
  context.fetch = (_, options) => { signals.push(options.signal); return new Promise(() => {}); };
  const result = await context.refreshExchangeRates();
- assert.equal(result.get('SGD'), 1.279);
+ assert.equal(result.get('SGD'), context.bundledExchangeRates.get('SGD'));
  assert.equal(signals.length, 2);
  assert(signals.every(signal => signal.aborted));
  assert.equal(context.currencyFailure, 'timeout');
