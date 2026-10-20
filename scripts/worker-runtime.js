@@ -4,6 +4,7 @@ function newAbortError(message) {
 	error.name = 'AbortError';
 	return error;
 }
+var calculationTimeout = 30000;
 function init() {
 	let resolveInitialised, rejectInitialised, timer;
 	const result = { state: 'new', initialisedPromise: new Promise((resolve, reject) => {
@@ -20,6 +21,12 @@ function init() {
 		result.resolveDone = result.rejectError = undefined;
 	};
 	result.cancel = () => fail(newAbortError('cancelled'));
+	result.startCalculationTimer = timeout => {
+		clearTimeout(timer);
+		// A main-thread deadline also covers a stuck engine that never checks its
+		// own timeout. Leave a short margin for posting the normal WASM result.
+		timer = setTimeout(() => fail(new Error('Calculation timed out. Try a simpler expression.')), timeout + 1000);
+	};
 	try {
 		result.worker = new WorkerWrapper({ name: 'fend worker' });
 		timer = setTimeout(() => fail(new Error('Calculator startup timed out. Reopen the app online and try again.')), 15000);
@@ -45,6 +52,7 @@ function cancelCalculations() {
 	workerCache?.cancel();
 }
 async function query(args) {
+	args = { ...args, timeout: Math.min(calculationTimeout, Math.max(1, Number.isFinite(args.timeout) ? args.timeout : calculationTimeout)) };
 	const currentId = ++id;
 	let worker = workerCache;
 	if (!worker || worker.state === 'failed' || worker.state === 'busy') {
@@ -69,6 +77,7 @@ async function query(args) {
 		worker.resolveDone = resolve;
 		worker.rejectError = reject;
 		worker.state = 'busy';
+		worker.startCalculationTimer(args.timeout);
 		try { worker.worker.postMessage(args); }
 		catch (error) { worker.rejectError = undefined; worker.cancel(); reject(error); }
 	});

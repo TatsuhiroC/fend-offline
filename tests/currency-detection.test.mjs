@@ -38,6 +38,7 @@ async function calculator() {
  context.fetch = async () => {requests++; return new Response(JSON.stringify(fixture));};
  return {
   context,
+  setCny(rate) {fixture.usd.cny = rate;},
   async run(input, fresh = true) {
    requests = 0;
    const result = await context.fend(input,1000,variables,fresh);
@@ -57,6 +58,55 @@ test('real currency aliases refresh online rates on each submitted conversion', 
    assert.equal(actual.requests,2,input);
    assert.match(actual.result,/^(?:1000|10) (?:TL|zł|zl|TRY)$|^1000₺$/,input);
   }
+ } finally {await calc.close();}
+});
+
+test('currency functions refresh even with string arguments and dimensionless output', async () => {
+ const calc = await calculator();
+ try {
+  await calc.run('f = x: 100 USD to CNY');
+  calc.setCny(8);
+  assert.deepEqual(await calc.run('f("ignored")'), {result:'800 CNY', requests:2});
+  await calc.run('ratio = x: (x USD) / (1 CNY)');
+  calc.setCny(8.5);
+  assert.deepEqual(await calc.run('ratio(1)'), {result:'8.5', requests:2});
+  await calc.run('alias = ratio');
+  calc.setCny(9);
+  assert.deepEqual(await calc.run('alias(1)'), {result:'9', requests:2});
+  assert.deepEqual(await calc.run('ans + 1'), {result:'10', requests:0},'a numeric answer must not retain the function dependency');
+  assert.deepEqual(await calc.run('n = (1 USD) / (1 CNY)'), {result:'9', requests:2});
+  assert.deepEqual(await calc.run('n + 1'), {result:'10', requests:0},'a stored numeric value is ordinary arithmetic');
+ } finally {await calc.close();}
+});
+
+test('parenthesized bindings persist and function definitions do not shadow global currency units', async () => {
+ const calc = await calculator();
+ let unwantedRequests = 0;
+ calc.context.fetch = async () => {unwantedRequests++; throw new Error('offline');};
+ try {
+  for (const [input, expected] of [
+   ['(try = 2)','2'], ['try + 1','3'], ['((USD = 2))','2'], ['USD + 1','3'],
+   ['(x = "100 USD")','100 USD'], ['x','100 USD'], ['ans','100 USD'],
+   ['f = z: "USD"',null], ['f(1)','USD'], ['g = CNY: CNY + 1',null], ['g(2)','3'],
+   ['h = z: (EUR = 2)',null]
+  ]) {
+   const actual = await calc.run(input);
+   if (expected !== null) assert.equal(actual.result, expected, input);
+   assert.equal(unwantedRequests, 0, input);
+  }
+  calc.context.fetch = async () => {unwantedRequests++; return new Response(JSON.stringify({date:new Date().toISOString().slice(0,10),usd:Object.fromEntries([...calc.context.bundledExchangeRates].map(([c,r])=>[c.toLowerCase(),r]))}));};
+  await calc.run('100 CNY to EUR');
+  assert.equal(unwantedRequests,2,'defining a function must not shadow global currency units');
+ } finally {await calc.close();}
+});
+
+test('the real engine interrupts expensive calculations and accepts the next input', {timeout:5000}, async () => {
+ const calc = await calculator();
+ try {
+  const result = await calc.context.fend('100000!',25,'');
+  assert.equal(result.ok,false);
+  assert.match(result.message,/interrupt|timed out/i);
+  assert.equal((await calc.run('1 + 1')).result,'2');
  } finally {await calc.close();}
 });
 

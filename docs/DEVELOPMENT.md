@@ -50,6 +50,10 @@ npm run test:web
 
 运行时处理存储受限、损坏的历史记录、引擎启动失败、过期计算响应和过大的汇率响应。PR 自动执行依赖漏洞检查及计算回归测试。
 
+提交的计算最多运行 30 秒，输入预览仍使用较短的内核预算。主线程另设超时保护；即使内核不响应，也会终止工作线程，下一次计算可以重新启动。汇率下载的 15 秒限时独立计算。
+
+`vendor-manifest.json` 记录预打包组件的已知版本、来源和所有 `assets/` 文件的 SHA-256。每次构建校验文件和 React 版本；同步上游时须同时审查并更新清单。`npm run vendor:audit` 通过 OSV 查询已知版本的 React、React DOM 和 fend-core，PR 检查也执行此命令。原始包未记录 Scheduler 和动画组件的精确版本，所以它们只有文件校验，不在该漏洞查询的覆盖范围内；这项检查也不覆盖 Android 原生依赖。
+
 ## PWA 部署
 
 GitHub Pages 由 [.github/workflows/deploy-pages.yml](../.github/workflows/deploy-pages.yml) 发布 `www/`。仓库设置应为 **Settings → Pages → Source: GitHub Actions**。

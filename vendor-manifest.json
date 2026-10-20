@@ -1,0 +1,43 @@
+{
+  "description": "Unmodified upstream web assets. Update hashes and reviewed component versions together when syncing upstream.",
+  "components": [
+    {
+      "name": "react",
+      "version": "19.2.7",
+      "ecosystem": "npm",
+      "source": "https://github.com/facebook/react"
+    },
+    {
+      "name": "react-dom",
+      "version": "19.2.7",
+      "ecosystem": "npm",
+      "source": "https://github.com/facebook/react"
+    },
+    {
+      "name": "fend-core",
+      "version": "1.5.8",
+      "ecosystem": "crates.io",
+      "source": "https://github.com/printfn/fend/releases/tag/v1.5.8"
+    }
+  ],
+  "additionalComponents": [
+    {
+      "name": "scheduler",
+      "source": "https://github.com/facebook/react",
+      "version": null
+    },
+    {
+      "name": "react-svg-spinners / svg-spinners",
+      "source": "https://github.com/n3r4zzurr0/svg-spinners",
+      "version": null
+    }
+  ],
+  "coverage": "Exact versions of additional components were not recorded in the upstream bundle. Hash verification covers all assets; vulnerability queries cover only components with known versions. This is not a native Android dependency audit.",
+  "files": {
+    "assets/App-BkQrMm5v.js": "11b38fc0644d16a5feb69627036d6541772722b27a465729b0faaf69d3d0412a",
+    "assets/App-CtSXWVvZ.css": "1860caa010d5b231fa6820ca7662f8889bd251b9ed532c042d6821615face6aa",
+    "assets/fend_wasm_bg-DxrPVr6w.wasm": "16121d3bd23f084e51db9501b7ba6be6b5446bbbc1131793525861dcb1bc14d6",
+    "assets/main-BGizNAwM.js": "7d166d3006741becf6584a8633707cf5bbfdefe6b0d2a86f6ffc6e7eede05085",
+    "assets/worker-DSB9rMtK.js": "9cddc4d1fb878511fca12cf90b2f9da881f5fb5a09201228b136e232dda2b405"
+  }
+}

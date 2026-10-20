@@ -19,6 +19,7 @@ const pendingState = 'const [isPending, startTransition] = (0, import_react.useT
 const pendingBlock = pendingState + '\n\tlet t3;';
 const keyHandler = 't3 = (event) => {';
 const resultLog = 'console.log(result);';
+const submittedTimeout = 'fend(input, 1e9, variables)';
 const workerRegion = /\/\/#region src\/lib\/fend\.ts\n[\s\S]*?(?=\/\/#endregion)/;
 const history = 'var initialHistory = JSON.parse(localStorage.getItem("fend_history") || "[]");';
 const saveHistory = 'localStorage.setItem("fend_history", JSON.stringify(updatedHistory.slice(-100)));';
@@ -55,7 +56,7 @@ function pruneUnusedRuntime(source) {
 for (const name of bundles) {
 	const file = join(assets, name);
 	const source = readFileSync(file, 'utf8');
-	if (!workerRegion.test(source) || ![history, saveHistory, oldSubmit, clear, historyLimit, historyReturn, hintState, hintInput, hintResult, inputHook, inputCall, pendingBlock, keyHandler, resultLog, inputRef, submittedFormula, 'setOutput(null);'].every(marker => source.includes(marker))) {
+	if (!workerRegion.test(source) || ![history, saveHistory, oldSubmit, clear, historyLimit, historyReturn, hintState, hintInput, hintResult, inputHook, inputCall, pendingBlock, keyHandler, resultLog, inputRef, submittedFormula, submittedTimeout, 'setOutput(null);'].every(marker => source.includes(marker))) {
 		throw new Error(`[runtime] upstream runtime/history/UI changed in ${name}`);
 	}
 	const patched = source.replace(workerRegion, () => `//#region src/lib/fend.ts\n${runtime}\n`)
@@ -73,6 +74,7 @@ for (const name of bundles) {
 		.replace(pendingBlock, 'let t3;')
 		.replace(keyHandler, keyHandler + '\n\t\t\t\tif (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) return;')
 		.replace(resultLog, '')
+		.replace(submittedTimeout, 'fend(input, calculationTimeout, variables)')
 		.replace(hintInput, 'hintInputRef.current = value;\n\t\t\tconst hintVersion = ++hintVersionRef.current;\n\t\t\t' + hintInput)
 		.replace(hintResult, 'const evaluatedHint = await evaluateHint(value);\n\t\t\t\tif (hintVersion === hintVersionRef.current) setHint(evaluatedHint);')
 		.replace(saveHistory, 'try { localStorage.setItem("fend_history", JSON.stringify(updatedHistory.slice(-100))); } catch {}')
