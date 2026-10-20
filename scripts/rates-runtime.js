@@ -127,49 +127,78 @@ function isCurrencyToken(code) {
 // These small snapshots track names we have observed, never decode the engine's
 // private variable format. Keep adjacent states for React's pending transitions.
 var currencyBindings = new Map();
-function stringBinding(tokens, index, bindings) {
-	while (tokens[index]?.value === '(') index++;
-	return tokens[index]?.type === 'string' || bindings.get(tokens[index]?.value) === true;
-}
-function bindingsAfterInput(input, variables) {
+function currencyFacts(input, variables) {
 	const bindings = new Map(currencyBindings.get(variables));
 	const tokens = currencyTokens(input);
+	const groups = new Map(), stack = [];
 	for (let i = 0; i < tokens.length; i++) {
-		if ((i === 0 || tokens[i - 1].value === ';') && tokens[i].type === 'word' && tokens[i + 1]?.value === '=') {
-			bindings.set(tokens[i].value, stringBinding(tokens, i + 2, bindings));
-		}
+		if (tokens[i].value === '(') stack.push(i);
+		else if (tokens[i].value === ')' && stack.length) groups.set(stack.pop(), i);
 	}
-	return bindings;
+	// This is dependency metadata, not an alternative evaluator. The WASM result
+	// remains authoritative. Bound the walk even for deeply nested user input.
+	function inspect(start, end, scope, depth = 0) {
+		if (depth > 64) return { currency: true, string: false };
+		while (groups.get(start) === end - 1) { start++; end--; }
+		let statement = start, currency = false, value;
+		for (let i = start; i < end; i++) {
+			if (groups.has(i)) { i = groups.get(i); continue; }
+			if (tokens[i].value !== ';') continue;
+			value = inspect(statement, i, scope, depth + 1);
+			currency ||= value.currency;
+			statement = i + 1;
+		}
+		if (statement !== start) {
+			value = inspect(statement, end, scope, depth + 1);
+			return { ...value, currency: currency || value.currency };
+		}
+		const first = tokens[start];
+		if (first?.type === 'word' && tokens[start + 1]?.value === '=') {
+			value = inspect(start + 2, end, scope, depth + 1);
+			// Scalar results do not re-run their original expression. Only a
+			// function retains that dependency when it is called again.
+			scope.set(first.value, { ...value, currency: !!value.callable && value.currency });
+			return value;
+		}
+		if (first?.type === 'word' && tokens[start + 1]?.value === ':') {
+			// Defining a function does not execute its body or bind its parameter
+			// in the caller's scope. Retain the body's currency dependencies.
+			const local = new Map(scope);
+			local.set(first.value, { currency: false, string: false });
+			return { ...inspect(start + 2, end, local, depth + 1), callable: true };
+		}
+		if (end - start === 1 && scope.has(first?.value)) return scope.get(first.value);
+		let string = false;
+		for (let i = start; i < end; i++) {
+			const token = tokens[i];
+			if (groups.has(i)) {
+				value = inspect(i + 1, groups.get(i), scope, depth + 1);
+				i = groups.get(i);
+			} else if (token.type === 'word') {
+				value = scope.get(token.value) ?? { currency: isCurrencyToken(token.value), string: false };
+			} else value = { currency: false, string: token.type === 'string' };
+			currency ||= value.currency;
+			string ||= value.string;
+		}
+		return { currency, string };
+	}
+	return { bindings, value: inspect(0, tokens.length, bindings) };
 }
 function rememberCurrencyBindings(input, variables, result) {
 	if (!result.ok || !result.variables) return;
-	const bindings = bindingsAfterInput(input, variables);
-	if (result.result) {
-		const tokens = currencyTokens(input);
-		let lastStatement = 0;
-		for (let i = 0; i < tokens.length; i++) if (tokens[i].value === ';') lastStatement = i + 1;
-		bindings.set('ans', stringBinding(tokens, lastStatement, bindings));
-	}
+	const { bindings, value } = currencyFacts(input, variables);
+	if (result.result) bindings.set('ans', { ...value, currency: !!value.callable && value.currency });
 	currencyBindings.delete(result.variables);
 	currencyBindings.set(result.variables, bindings);
 	while (currencyBindings.size > 3) currencyBindings.delete(currencyBindings.keys().next().value);
 }
 function usesCurrency(input, result, variables = '') {
-	const bindings = new Map(currencyBindings.get(variables));
-	const tokens = currencyTokens(input);
-	let hasString = false;
-	for (let i = 0; i < tokens.length; i++) {
-		const token = tokens[i];
-		if (token.value === ';') hasString = false;
-		if (token.type === 'string' || bindings.get(token.value) === true) hasString = true;
-		if (token.type !== 'word') continue;
-		if (tokens[i + 1]?.value === '=') { bindings.set(token.value, stringBinding(tokens, i + 2, bindings)); continue; }
-		if (!bindings.has(token.value) && isCurrencyToken(token.value)) return true;
-	}
+	const { value } = currencyFacts(input, variables);
+	if (value.currency) return true;
 	if (!result.ok) return /currency exchange rate|exchange rates/i.test(result.message);
 	// Monetary variables can introduce units absent from the input. String output
 	// is intentionally not inspected: it is not a currency expression.
-	return !hasString && currencyTokens(result.result).some(token => token.type === 'word' && isCurrencyToken(token.value));
+	return !value.callable && !value.string && currencyTokens(result.result).some(token => token.type === 'word' && isCurrencyToken(token.value));
 }
 
 async function refreshExchangeRates() {
