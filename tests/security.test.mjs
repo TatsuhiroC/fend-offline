@@ -35,6 +35,44 @@ test('blocked Worker construction and failed postMessage return errors and allow
  assert.equal((await context.query({})).result, '2');
 });
 
+test('a stuck calculation is terminated at its deadline, then retry works and timers are cleared', async () => {
+ const timers = new Map(), posted = [];
+ let nextTimer = 0, stopped = 0, reply = false;
+ class Worker {
+  constructor() {queueMicrotask(() => this.onmessage({data:'ready'}));}
+  terminate() {stopped++;}
+  postMessage(args) {
+   posted.push(args.timeout);
+   if (reply) queueMicrotask(() => this.onmessage({data:{ok:true,result:'2'}}));
+  }
+ }
+ const context = runtime(Worker, {
+  setTimeout(fn,ms) {timers.set(++nextTimer,{fn,ms}); return nextTimer;},
+  clearTimeout(id) {timers.delete(id);}
+ });
+ assert(app.includes('fend(input, calculationTimeout, variables)'));
+ const pending = context.query({timeout:1e9});
+ await new Promise(resolve => setImmediate(resolve));
+ assert.deepEqual(posted,[30000]);
+ assert.equal(timers.size,1,'startup timer must be replaced by a computation deadline');
+ const deadline = [...timers.values()][0];
+ assert.equal(deadline.ms,31000);
+ deadline.fn();
+ await assert.rejects(pending,/Calculation timed out/);
+ assert.equal(stopped,1);
+ assert.equal(timers.size,0);
+ reply = true;
+ assert.equal((await context.query({timeout:100})).result,'2');
+ assert.equal(posted.at(-1),100,'hints keep their short engine timeout');
+ assert.equal(timers.size,0,'successful calculations leave no timer behind');
+ reply = false;
+ const cancelled = context.query({timeout:1000});
+ await new Promise(resolve => setImmediate(resolve));
+ context.cancelCalculations();
+ await assert.rejects(cancelled,{name:'AbortError'});
+ assert.equal(timers.size,0,'cancellation removes the deadline');
+});
+
 test('hints cannot interrupt a submission; clearing cancels pending rate results', async () => {
  let finishRates;
  const data = new Map([['USD', 1], ['CNY', 7]]);
