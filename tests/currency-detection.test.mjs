@@ -50,6 +50,19 @@ async function calculator() {
  };
 }
 
+test('the updated engine reports 1.5.9 and reads synthetic variables serialized by 1.5.8', async () => {
+ const calc=await calculator();
+ try {
+  assert.equal((await calc.run('version')).result,'1.5.9');
+  await calc.run('100 USD to CNY');
+  const fixture=JSON.parse(await readFile('tests/fixtures/fend-1.5.8-variables.json','utf8'));
+  const scalar=await calc.context.fend('x + 1',1000,fixture.variables,false);
+  assert.equal(scalar.ok,true);assert.equal(scalar.result,'5');
+  const fn=await calc.context.fend('f("ignored")',1000,fixture.variables,false);
+  assert.equal(fn.ok,true);assert.equal(fn.result,'750 CNY');
+ } finally {await calc.close();}
+});
+
 test('real currency aliases refresh online rates on each submitted conversion', async () => {
  const calc = await calculator();
  try {

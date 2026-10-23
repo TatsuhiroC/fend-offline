@@ -28,6 +28,8 @@ npm run test:web
 
 计算内核来自 [printfn/fend](https://github.com/printfn/fend) 的 Rust / WebAssembly 构建。脚本只修改 `www/`，保留 `assets/` 的上游源文件。构建会嵌入备用汇率、移除闲置加载动画和等待工具、清除不存在的调试映射引用，再为整组资源生成与内容对应的版本地址。嵌入后不再发布独立 XML 副本。
 
+当前资源同步自 fend **1.5.9**（上游提交 `71f3fcd796ca87074a94452162ca0a7044ca5da3`），包含 React / React DOM **19.3.1**。来源和原始文件摘要见 `vendor-manifest.json`。构建先将上游 `/fend/assets/` 地址转为相对模块地址，确保带版本的 PWA 目录、GitHub Pages 子路径和 APK 本地资源都能加载工作线程与 WASM。
+
 同步上游 UI/WASM 后必须运行 `npm run test:web`；补丁无法匹配时构建会失败。第三方许可保留在 `THIRD_PARTY_NOTICES.txt`，会随网页和 APK 一起发布。
 
 ## 汇率和运行时
@@ -52,7 +54,7 @@ npm run test:web
 
 提交的计算最多运行 30 秒，输入预览仍使用较短的内核预算。主线程另设超时保护；即使内核不响应，也会终止工作线程，下一次计算可以重新启动。汇率下载的 15 秒限时独立计算。
 
-`vendor-manifest.json` 记录预打包组件的已知版本、来源和所有 `assets/` 文件的 SHA-256。每次构建校验文件和 React 版本；同步上游时须同时审查并更新清单。`npm run vendor:audit` 通过 OSV 查询已知版本的 React、React DOM 和 fend-core，PR 检查也执行此命令。原始包未记录 Scheduler 和动画组件的精确版本，所以它们只有文件校验，不在该漏洞查询的覆盖范围内；这项检查也不覆盖 Android 原生依赖。
+`vendor-manifest.json` 记录预打包组件的已知版本、来源和所有 `assets/` 文件的 SHA-256。每次构建校验文件和 React 版本；同步上游时须同时审查并更新清单。`npm run vendor:audit` 通过 OSV 查询 React、React DOM、Scheduler、react-svg-spinners、fend-core、wasm-bindgen 和 js-sys，PR 检查也执行此命令。精确版本来自上游发布版本的 npm / Cargo 锁文件。复制的 SVG 图形没有单独记录的包版本；查询也不覆盖全部 Rust 构建工具依赖或 Android 原生依赖。
 
 ## PWA 部署
 

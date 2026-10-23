@@ -11,9 +11,9 @@ var __exportAll = (all, no_symbols) => {
 };
 //#endregion
 //#region ../wasm/fend-wasm/fend_wasm_bg.wasm?url
-var fend_wasm_bg_default = "" + new URL("./fend_wasm_bg-DxrPVr6w.wasm", import.meta.url).href;
+var fend_wasm_bg_default = "/fend/assets/fend_wasm_bg-BO_oxczj.wasm";
 //#endregion
-//#region ../../../../__vite-plugin-wasm-helper
+//#region ../../../../../../__vite-plugin-wasm-helper
 var __vite_plugin_wasm_helper_default = async (opts = {}, url) => {
 	let result;
 	if (url.startsWith("data:")) {
@@ -71,16 +71,16 @@ function evaluateFendWithVariablesJson$1(input, timeout, variables) {
 function initialiseWithHandlers$1(currency_data) {
 	wasm.initialiseWithHandlers(addHeapObject(currency_data));
 }
-function __wbg___wbindgen_is_undefined_67b456be8673d3d7(arg0) {
+function __wbg___wbindgen_is_undefined_8865fb403f8fe9d8(arg0) {
 	return getObject(arg0) === void 0;
 }
-function __wbg___wbindgen_number_get_9bb1761122181af2(arg0, arg1) {
+function __wbg___wbindgen_number_get_2e0e7dee9f701a71(arg0, arg1) {
 	const obj = getObject(arg1);
 	const ret = typeof obj === "number" ? obj : void 0;
 	getDataViewMemory0().setFloat64(arg0 + 8, isLikeNone(ret) ? 0 : ret, true);
 	getDataViewMemory0().setInt32(arg0 + 0, !isLikeNone(ret), true);
 }
-function __wbg___wbindgen_string_get_72bdf95d3ae505b1(arg0, arg1) {
+function __wbg___wbindgen_string_get_0380ccaa2f57f0d9(arg0, arg1) {
 	const obj = getObject(arg1);
 	const ret = typeof obj === "string" ? obj : void 0;
 	var ptr1 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_export, wasm.__wbindgen_export2);
@@ -88,10 +88,10 @@ function __wbg___wbindgen_string_get_72bdf95d3ae505b1(arg0, arg1) {
 	getDataViewMemory0().setInt32(arg0 + 4, len1, true);
 	getDataViewMemory0().setInt32(arg0 + 0, ptr1, true);
 }
-function __wbg___wbindgen_throw_1506f2235d1bdba0(arg0, arg1) {
+function __wbg___wbindgen_throw_41e9ee4f547fc59a(arg0, arg1) {
 	throw new Error(getStringFromWasm0(arg0, arg1));
 }
-function __wbg_forEach_2d5872dd26aea3b2(arg0, arg1, arg2) {
+function __wbg_forEach_7ad975c8e42636ed(arg0, arg1, arg2) {
 	try {
 		var state0 = {
 			a: arg1,
@@ -101,7 +101,7 @@ function __wbg_forEach_2d5872dd26aea3b2(arg0, arg1, arg2) {
 			const a = state0.a;
 			state0.a = 0;
 			try {
-				return __wasm_bindgen_func_elem_2876$1(a, state0.b, arg0, arg1);
+				return __wasm_bindgen_func_elem_2555$1(a, state0.b, arg0, arg1);
 			} finally {
 				state0.a = a;
 			}
@@ -111,13 +111,13 @@ function __wbg_forEach_2d5872dd26aea3b2(arg0, arg1, arg2) {
 		state0.a = 0;
 	}
 }
-function __wbg_getTime_00b3f7db575e4ef5(arg0) {
+function __wbg_getTime_f5a55efff2585d5d(arg0) {
 	return getObject(arg0).getTime();
 }
-function __wbg_getTimezoneOffset_08e2892156231088(arg0) {
+function __wbg_getTimezoneOffset_2e851fdaecc2dc92(arg0) {
 	return getObject(arg0).getTimezoneOffset();
 }
-function __wbg_new_0_445c13a750296eb6() {
+function __wbg_new_0_72d020f0c63443d4() {
 	return addHeapObject(/* @__PURE__ */ new Date());
 }
 function __wbg_now_e7c6795a7f81e10f(arg0) {
@@ -127,22 +127,22 @@ function __wbg_performance_3fcf6e32a7e1ed0a(arg0) {
 	const ret = getObject(arg0).performance;
 	return addHeapObject(ret);
 }
-function __wbg_random_33cfffca5c784d5e() {
+function __wbg_random_5a4cafd2f02395ff() {
 	return Math.random();
 }
-function __wbg_static_accessor_GLOBAL_9d53f2689e622ca1() {
+function __wbg_static_accessor_GLOBAL_266715b9d96ba635() {
 	const ret = typeof global === "undefined" ? null : global;
 	return isLikeNone(ret) ? 0 : addHeapObject(ret);
 }
-function __wbg_static_accessor_GLOBAL_THIS_a1a35cec07001a8a() {
+function __wbg_static_accessor_GLOBAL_THIS_10fb7dc1ae063179() {
 	const ret = typeof globalThis === "undefined" ? null : globalThis;
 	return isLikeNone(ret) ? 0 : addHeapObject(ret);
 }
-function __wbg_static_accessor_SELF_4c59f6c7ea29a144() {
+function __wbg_static_accessor_SELF_0b583911f537483a() {
 	const ret = typeof self === "undefined" ? null : self;
 	return isLikeNone(ret) ? 0 : addHeapObject(ret);
 }
-function __wbg_static_accessor_WINDOW_e70ae9f2eb052253() {
+function __wbg_static_accessor_WINDOW_d7f903d1508cbdc4() {
 	const ret = typeof window === "undefined" ? null : window;
 	return isLikeNone(ret) ? 0 : addHeapObject(ret);
 }
@@ -152,8 +152,8 @@ function __wbindgen_object_clone_ref(arg0) {
 function __wbindgen_object_drop_ref(arg0) {
 	takeObject(arg0);
 }
-function __wasm_bindgen_func_elem_2876$1(arg0, arg1, arg2, arg3) {
-	wasm.__wasm_bindgen_func_elem_2876(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
+function __wasm_bindgen_func_elem_2555$1(arg0, arg1, arg2, arg3) {
+	wasm.__wasm_bindgen_func_elem_2555(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 function addHeapObject(obj) {
 	if (heap_next === heap.length) heap.push(heap.length + 1);
@@ -258,7 +258,9 @@ function __wbg_set_wasm(val) {
 //#endregion
 //#region ../wasm/fend-wasm/fend_wasm_bg.wasm
 var fend_wasm_bg_exports = /* @__PURE__ */ __exportAll({
-	__wasm_bindgen_func_elem_2876: () => __wasm_bindgen_func_elem_2876,
+	__abort_handler: () => __abort_handler,
+	__instance_terminated: () => __instance_terminated,
+	__wasm_bindgen_func_elem_2555: () => __wasm_bindgen_func_elem_2555,
 	__wbindgen_add_to_stack_pointer: () => __wbindgen_add_to_stack_pointer,
 	__wbindgen_export: () => __wbindgen_export,
 	__wbindgen_export2: () => __wbindgen_export2,
@@ -272,24 +274,24 @@ var fend_wasm_bg_exports = /* @__PURE__ */ __exportAll({
 	substituteInlineFendExpressions: () => substituteInlineFendExpressions
 });
 URL = globalThis.URL;
-const { memory, initialiseWithHandlers, evaluate_fend_with_timeout, evaluateFendWithTimeout, evaluateFendWithTimeoutMultiple, evaluateFendWithVariablesJson, substituteInlineFendExpressions, __wasm_bindgen_func_elem_2876, __wbindgen_export, __wbindgen_export2, __wbindgen_add_to_stack_pointer, __wbindgen_export3 } = await __vite_plugin_wasm_helper_default({ "./fend_wasm_bg.js": {
+const { memory, evaluateFendWithTimeout, evaluateFendWithTimeoutMultiple, evaluateFendWithVariablesJson, evaluate_fend_with_timeout, initialiseWithHandlers, substituteInlineFendExpressions, __abort_handler, __instance_terminated, __wasm_bindgen_func_elem_2555, __wbindgen_export, __wbindgen_export2, __wbindgen_add_to_stack_pointer, __wbindgen_export3 } = await __vite_plugin_wasm_helper_default({ "./fend_wasm_bg.js": {
 	"__wbindgen_object_drop_ref": __wbindgen_object_drop_ref,
-	"__wbg_forEach_2d5872dd26aea3b2": __wbg_forEach_2d5872dd26aea3b2,
-	"__wbg_performance_3fcf6e32a7e1ed0a": __wbg_performance_3fcf6e32a7e1ed0a,
+	"__wbg_forEach_7ad975c8e42636ed": __wbg_forEach_7ad975c8e42636ed,
 	"__wbg_now_e7c6795a7f81e10f": __wbg_now_e7c6795a7f81e10f,
-	"__wbg_getTime_00b3f7db575e4ef5": __wbg_getTime_00b3f7db575e4ef5,
-	"__wbg_getTimezoneOffset_08e2892156231088": __wbg_getTimezoneOffset_08e2892156231088,
-	"__wbg_new_0_445c13a750296eb6": __wbg_new_0_445c13a750296eb6,
+	"__wbg_performance_3fcf6e32a7e1ed0a": __wbg_performance_3fcf6e32a7e1ed0a,
+	"__wbg_getTime_f5a55efff2585d5d": __wbg_getTime_f5a55efff2585d5d,
+	"__wbg_getTimezoneOffset_2e851fdaecc2dc92": __wbg_getTimezoneOffset_2e851fdaecc2dc92,
+	"__wbg_new_0_72d020f0c63443d4": __wbg_new_0_72d020f0c63443d4,
+	"__wbg_static_accessor_GLOBAL_THIS_10fb7dc1ae063179": __wbg_static_accessor_GLOBAL_THIS_10fb7dc1ae063179,
+	"__wbg_static_accessor_SELF_0b583911f537483a": __wbg_static_accessor_SELF_0b583911f537483a,
+	"__wbg_static_accessor_GLOBAL_266715b9d96ba635": __wbg_static_accessor_GLOBAL_266715b9d96ba635,
+	"__wbg_static_accessor_WINDOW_d7f903d1508cbdc4": __wbg_static_accessor_WINDOW_d7f903d1508cbdc4,
 	"__wbindgen_object_clone_ref": __wbindgen_object_clone_ref,
-	"__wbg_static_accessor_GLOBAL_THIS_a1a35cec07001a8a": __wbg_static_accessor_GLOBAL_THIS_a1a35cec07001a8a,
-	"__wbg_static_accessor_SELF_4c59f6c7ea29a144": __wbg_static_accessor_SELF_4c59f6c7ea29a144,
-	"__wbg_static_accessor_WINDOW_e70ae9f2eb052253": __wbg_static_accessor_WINDOW_e70ae9f2eb052253,
-	"__wbg_static_accessor_GLOBAL_9d53f2689e622ca1": __wbg_static_accessor_GLOBAL_9d53f2689e622ca1,
-	"__wbg_random_33cfffca5c784d5e": __wbg_random_33cfffca5c784d5e,
-	"__wbg___wbindgen_is_undefined_67b456be8673d3d7": __wbg___wbindgen_is_undefined_67b456be8673d3d7,
-	"__wbg___wbindgen_number_get_9bb1761122181af2": __wbg___wbindgen_number_get_9bb1761122181af2,
-	"__wbg___wbindgen_string_get_72bdf95d3ae505b1": __wbg___wbindgen_string_get_72bdf95d3ae505b1,
-	"__wbg___wbindgen_throw_1506f2235d1bdba0": __wbg___wbindgen_throw_1506f2235d1bdba0
+	"__wbg_random_5a4cafd2f02395ff": __wbg_random_5a4cafd2f02395ff,
+	"__wbg___wbindgen_throw_41e9ee4f547fc59a": __wbg___wbindgen_throw_41e9ee4f547fc59a,
+	"__wbg___wbindgen_number_get_2e0e7dee9f701a71": __wbg___wbindgen_number_get_2e0e7dee9f701a71,
+	"__wbg___wbindgen_string_get_0380ccaa2f57f0d9": __wbg___wbindgen_string_get_0380ccaa2f57f0d9,
+	"__wbg___wbindgen_is_undefined_8865fb403f8fe9d8": __wbg___wbindgen_is_undefined_8865fb403f8fe9d8
 } }, fend_wasm_bg_default);
 //#endregion
 //#region ../wasm/fend-wasm/fend_wasm.js
@@ -312,4 +314,4 @@ self.addEventListener("message", (ev) => {
 postMessage("ready");
 //#endregion
 
-//# sourceMappingURL=worker-DSB9rMtK.js.map
+//# sourceMappingURL=worker-DQwZneAa.js.map

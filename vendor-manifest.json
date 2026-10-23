@@ -1,43 +1,69 @@
 {
-  "description": "Unmodified upstream web assets. Update hashes and reviewed component versions together when syncing upstream.",
+  "description": "Unmodified official fend web assets. Build-time patches apply only to www/.",
+  "upstream": {
+    "version": "1.5.9",
+    "revision": "71f3fcd796ca87074a94452162ca0a7044ca5da3",
+    "url": "https://printfn.github.io/fend/",
+    "release": "https://github.com/printfn/fend/releases/tag/v1.5.9",
+    "dependencyLockfile": "https://github.com/printfn/fend/blob/71f3fcd796ca87074a94452162ca0a7044ca5da3/web/package-lock.json"
+  },
   "components": [
     {
       "name": "react",
-      "version": "19.2.7",
+      "version": "19.3.1",
       "ecosystem": "npm",
       "source": "https://github.com/facebook/react"
     },
     {
       "name": "react-dom",
-      "version": "19.2.7",
+      "version": "19.3.1",
       "ecosystem": "npm",
       "source": "https://github.com/facebook/react"
     },
     {
+      "name": "scheduler",
+      "version": "0.28.0",
+      "ecosystem": "npm",
+      "source": "https://github.com/facebook/react"
+    },
+    {
+      "name": "react-svg-spinners",
+      "version": "0.3.1",
+      "ecosystem": "npm",
+      "source": "https://www.npmjs.com/package/react-svg-spinners"
+    },
+    {
       "name": "fend-core",
-      "version": "1.5.8",
+      "version": "1.5.9",
       "ecosystem": "crates.io",
-      "source": "https://github.com/printfn/fend/releases/tag/v1.5.8"
+      "source": "https://github.com/printfn/fend/releases/tag/v1.5.9"
+    },
+    {
+      "name": "wasm-bindgen",
+      "version": "0.2.129",
+      "ecosystem": "crates.io",
+      "source": "https://github.com/printfn/fend/blob/71f3fcd796ca87074a94452162ca0a7044ca5da3/Cargo.lock"
+    },
+    {
+      "name": "js-sys",
+      "version": "0.3.106",
+      "ecosystem": "crates.io",
+      "source": "https://github.com/printfn/fend/blob/71f3fcd796ca87074a94452162ca0a7044ca5da3/Cargo.lock"
     }
   ],
   "additionalComponents": [
     {
-      "name": "scheduler",
-      "source": "https://github.com/facebook/react",
-      "version": null
-    },
-    {
-      "name": "react-svg-spinners / svg-spinners",
+      "name": "svg-spinners artwork copied by react-svg-spinners",
       "source": "https://github.com/n3r4zzurr0/svg-spinners",
       "version": null
     }
   ],
-  "coverage": "Exact versions of additional components were not recorded in the upstream bundle. Hash verification covers all assets; vulnerability queries cover only components with known versions. This is not a native Android dependency audit.",
+  "coverage": "Known npm component versions are recorded from the upstream release lockfile; WASM components from its Cargo lockfile. Hashes cover all vendored assets. Copied SVG artwork has no separately recorded package version. Advisory queries do not cover all build-time Rust dependencies or native Android dependencies.",
   "files": {
-    "assets/App-BkQrMm5v.js": "11b38fc0644d16a5feb69627036d6541772722b27a465729b0faaf69d3d0412a",
+    "assets/App-BtYLwK94.js": "0cfdc33b4b98d2d7ac27dc5f8c076f013af48d0cd0a03d6edc4bfdb31a4c00a7",
     "assets/App-CtSXWVvZ.css": "1860caa010d5b231fa6820ca7662f8889bd251b9ed532c042d6821615face6aa",
-    "assets/fend_wasm_bg-DxrPVr6w.wasm": "16121d3bd23f084e51db9501b7ba6be6b5446bbbc1131793525861dcb1bc14d6",
-    "assets/main-BGizNAwM.js": "7d166d3006741becf6584a8633707cf5bbfdefe6b0d2a86f6ffc6e7eede05085",
-    "assets/worker-DSB9rMtK.js": "9cddc4d1fb878511fca12cf90b2f9da881f5fb5a09201228b136e232dda2b405"
+    "assets/fend_wasm_bg-BO_oxczj.wasm": "39cee4f3e3cf3e119508d2b8347665f406066d0fefbc441e6c3a1dcbf7963bdb",
+    "assets/main-DEPFPbIS.js": "8fe0379692d326c8b22774e8ff701f505c974cfa23fdecd869abfd8f77c5d9ea",
+    "assets/worker-DQwZneAa.js": "85cf44e84b7b8051093feaa7ff134d1c526a22e0f37cf7695f6628e35b73ae5b"
   }
 }
