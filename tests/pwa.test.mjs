@@ -34,7 +34,6 @@ test('retained loading animation renders exactly like the upstream component', a
 		const react = { createElement: (tag, attributes, ...children) => ({ tag, attributes, children }) };
 		const context = vm.createContext({
 			require_react: () => react,
-			__toESM: value => ({ default: value }),
 			__commonJSMin: callback => () => {
 				const module = { exports: {} };
 				callback(module.exports, module);

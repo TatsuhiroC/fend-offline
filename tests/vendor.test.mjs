@@ -26,11 +26,11 @@ test('vendor audit checks shipped package versions and fails on advisories or un
  await auditVendor(manifest, async (url,options) => {
   assert.equal(url,'https://api.osv.dev/v1/querybatch');
   const {queries} = JSON.parse(options.body);
-  assert.deepEqual(queries.map(query=>query.package.name),['react','react-dom','fend-core']);
-  assert.deepEqual(queries.map(query=>query.version),['19.2.7','19.2.7','1.5.8']);
+  assert.deepEqual(queries.map(query=>query.package.name),['react','react-dom','scheduler','react-svg-spinners','fend-core','wasm-bindgen','js-sys']);
+  assert.deepEqual(queries.map(query=>query.version),['19.3.1','19.3.1','0.28.0','0.3.1','1.5.9','0.2.129','0.3.106']);
   return Response.json({results:queries.map(()=>({}))});
  });
- await assert.rejects(auditVendor(manifest,async()=>Response.json({results:[{vulns:[{id:'TEST-CLIENT-ADVISORY'}]},{},{}]})),/react@19.2.7: TEST-CLIENT-ADVISORY/);
+ await assert.rejects(auditVendor(manifest,async()=>Response.json({results:manifest.components.map((_,i)=>i===0?{vulns:[{id:'TEST-CLIENT-ADVISORY'}]}:{})})),/react@19.3.1: TEST-CLIENT-ADVISORY/);
  await assert.rejects(auditVendor(manifest,async()=>new Response('',{status:503})),/HTTP 503/);
  await assert.rejects(auditVendor(manifest,async()=>Response.json({results:[]})),/Invalid/);
 });

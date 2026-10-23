@@ -390,7 +390,7 @@ test('committed submissions restore the current preview with committed variables
 });
 
 test('IME confirmation keys do not submit or clear input, while a normal Enter still submits', async () => {
- const handler = app.match(/t3 = \(event\) => \{([\s\S]*?)\n\t\t\};\n\t\t\$\[2\]/)[1];
+ const handler = app.match(/const onKeyDown = \(event\) => \{([\s\S]*?)\n\t\};\n\t\(0, import_react\.useEffect\)/)[1];
  let submitted = 0, cleared = 0, prevented = 0, output = 0;
  const actions = [];
  const context = vm.createContext({
