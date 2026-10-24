@@ -18,6 +18,18 @@
 
 普通的 `cup`、`pounds` 表示容量和质量；货币请写 `CUP`、`GBP`。货币别名如 `zł`、`zl`、`TL`、`₺` 也支持在线更新。
 
+### 对数和底数
+
+`log(5)` 以 10 为底，`ln(5)` 以 e 为底。其他整数底数可以直接写在 `log` 后：
+
+```text
+log7(8)          # 约 1.0686215613
+log3(27)         # 约 3
+10^(log(5))      # 约 5
+```
+
+`logN` 的底数 N 必须是大于等于 2 的整数。分数底数仍使用换底公式，例如以 0.5 为底：`ln(8)/ln(0.5)`。已有同名自定义函数优先。`approx.` 表示近似值；手工截短对数结果后再计算乘方，会产生相应误差。
+
 更多语法见 [fend 文档](https://printfn.github.io/fend/documentation/)。
 
 ## 离线使用和更新
@@ -53,6 +65,7 @@
 ## English summary
 
 - Press Enter to calculate, ↑ / ↓ to recall inputs, or submit `clear` to clear the screen. Use parentheses around a compound denominator; `100 N / (9.8 m/s^2) to kg` calculates mass.
+- Use `log7(8)` for a base-7 logarithm, `log(5)` for base 10, or `ln(5)` for base e. The `logN` shorthand accepts integer bases of at least 2; saved custom functions keep priority. Fractional bases use `ln(value)/ln(base)`.
 - Tap or click a previously submitted formula to load it into the input for editing, then press Enter to calculate. Text selection and copying remain available.
 - The web app works offline after completed caching. Tap the PWA update prompt, or close all calculator windows and reopen online. Clearing site data removes cached resources and saved rates.
 - Download a new APK from [Releases](https://github.com/TatsuhiroC/fend-offline/releases/latest) to update Android. Official releases keep the same package and signing certificate for upgrades.

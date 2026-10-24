@@ -9,8 +9,14 @@ test('vendored asset changes require a reviewed inventory update', async () => {
  const dir = await mkdtemp(join(tmpdir(),'fend-vendor-'));
  try {
   await cp('assets',join(dir,'assets'),{recursive:true});
+  await cp('engine',join(dir,'engine'),{recursive:true});
   await cp('vendor-manifest.json',join(dir,'vendor-manifest.json'));
   const manifest = await checkVendor(dir);
+  const entry = 'engine/worker-entry.js';
+  const source = await readFile(join(dir,entry),'utf8');
+  await writeFile(join(dir,entry),source + '\n// changed\n');
+  await assert.rejects(checkVendor(dir),/Engine source hash mismatch/);
+  await writeFile(join(dir,entry),source);
   const wasm = Object.keys(manifest.files).find(name=>name.endsWith('.wasm'));
   const bytes = await readFile(join(dir,wasm));
   bytes[bytes.length-1] ^= 1;
