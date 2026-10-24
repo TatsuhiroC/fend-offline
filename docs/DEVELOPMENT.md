@@ -18,7 +18,8 @@ npm run test:web
 
 | 路径 | 用途 |
 | --- | --- |
-| `assets/` | 上游 fend 的预构建 React 界面和 WASM 内核。 |
+| `assets/` | 上游 React 界面和包含本项目修复的 fend WASM 内核。 |
+| `engine/` | Rust 补丁、工作线程入口和内核重新构建说明。 |
 | `scripts/` | 汇率、计算引擎恢复、输入预览、离线缓存及 Android 构建补丁。 |
 | `tests/` | 使用实际 WASM 和受控网络数据的回归测试。 |
 | `exchange-rates.xml` | 内置备用汇率的源数据。 |
@@ -26,9 +27,9 @@ npm run test:web
 | `www/` | 自动生成的网页发布目录，不提交到仓库。 |
 | `docs/` | 使用、维护和 README 图片；不打入网页或 APK。 |
 
-计算内核来自 [printfn/fend](https://github.com/printfn/fend) 的 Rust / WebAssembly 构建。脚本只修改 `www/`，保留 `assets/` 的上游源文件。构建会嵌入备用汇率、移除闲置加载动画和等待工具、清除不存在的调试映射引用，再为整组资源生成与内容对应的版本地址。嵌入后不再发布独立 XML 副本。
+计算内核来自 [printfn/fend](https://github.com/printfn/fend) 的 Rust / WebAssembly 构建，包含任意整数底数对数和分数指数计算的本地补丁，来源及重新构建方法见 [engine/README.md](../engine/README.md)。普通网页构建只修改 `www/`。构建会嵌入备用汇率、移除闲置加载动画和等待工具、清除不存在的调试映射引用，再为整组资源生成与内容对应的版本地址。嵌入后不再发布独立 XML 副本。
 
-当前资源同步自 fend **1.5.9**（上游提交 `71f3fcd796ca87074a94452162ca0a7044ca5da3`），包含 React / React DOM **19.3.1**。来源和原始文件摘要见 `vendor-manifest.json`。构建先将上游 `/fend/assets/` 地址转为相对模块地址，确保带版本的 PWA 目录、GitHub Pages 子路径和 APK 本地资源都能加载工作线程与 WASM。
+当前资源基于 fend **1.5.9**（上游提交 `71f3fcd796ca87074a94452162ca0a7044ca5da3`），包含 React / React DOM **19.3.1**。来源、内核补丁、工具版本及文件摘要见 `vendor-manifest.json`。构建先将上游 `/fend/assets/` 地址转为相对模块地址，确保带版本的 PWA 目录、GitHub Pages 子路径和 APK 本地资源都能加载工作线程与 WASM。
 
 同步上游 UI/WASM 后必须运行 `npm run test:web`；补丁无法匹配时构建会失败。第三方许可保留在 `THIRD_PARTY_NOTICES.txt`，会随网页和 APK 一起发布。
 
@@ -101,6 +102,6 @@ npm ci
 npm run test:web
 ```
 
-Serve the generated `www/` directory over HTTP. `assets/` contains the upstream React/WASM build; patches apply only to `www/`. Run the regression suite after syncing upstream. `npm run rates:update` refreshes the bundled backup source; rebuild and deploy to publish it.
+Serve the generated `www/` directory over HTTP. `assets/` contains the upstream React UI and a locally patched fend WASM engine; see [engine/README.md](../engine/README.md) for the source patch and reproducible rebuild. Normal web build patches apply only to `www/`. Run the regression suite after syncing upstream. `npm run rates:update` refreshes the bundled backup source; rebuild and deploy to publish it.
 
 GitHub Pages publishes `www/` through its workflow. Capacitor packages that same output for Android; local Android builds require JDK 21 and the Android SDK. Tagged releases require the four signing secrets listed above. **Keep the existing release key for upgrades; generate a key only for a new project.** Back up the keystore and credentials securely. An optional certificate fingerprint prevents unexpected signing identities, and CI checks the APK signature before publishing.

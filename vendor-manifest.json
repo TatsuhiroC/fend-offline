@@ -1,5 +1,5 @@
 {
-  "description": "Unmodified official fend web assets. Build-time patches apply only to www/.",
+  "description": "Official fend UI assets with a locally patched Rust/WASM engine; see engine/README.md for source, patch and rebuild instructions.",
   "upstream": {
     "version": "1.5.9",
     "revision": "71f3fcd796ca87074a94452162ca0a7044ca5da3",
@@ -62,8 +62,22 @@
   "files": {
     "assets/App-BtYLwK94.js": "0cfdc33b4b98d2d7ac27dc5f8c076f013af48d0cd0a03d6edc4bfdb31a4c00a7",
     "assets/App-CtSXWVvZ.css": "1860caa010d5b231fa6820ca7662f8889bd251b9ed532c042d6821615face6aa",
-    "assets/fend_wasm_bg-BO_oxczj.wasm": "39cee4f3e3cf3e119508d2b8347665f406066d0fefbc441e6c3a1dcbf7963bdb",
+    "assets/fend_wasm_bg-BO_oxczj.wasm": "149c451d3214f2ff8f32e1c1106ffcf70c9bf91740ecb5b2bd2104f171dfc104",
     "assets/main-DEPFPbIS.js": "8fe0379692d326c8b22774e8ff701f505c974cfa23fdecd869abfd8f77c5d9ea",
-    "assets/worker-DQwZneAa.js": "85cf44e84b7b8051093feaa7ff134d1c526a22e0f37cf7695f6628e35b73ae5b"
+    "assets/worker-DQwZneAa.js": "c9a61bb939a613c54542bd0fab42f207093c350ba7888eefa6ee4248a4dc5f8e"
+  },
+  "localEngine": {
+    "patchVersion": "offline-math.1",
+    "sourceArchiveSha256": "380b9294ded46c03bacc0ca42a5eff8d555f033acdaff863d91850901a13b5f4",
+    "toolchain": {
+      "rust": "1.88.0",
+      "wasmBindgen": "0.2.129"
+    },
+    "worker": "assets/worker-DQwZneAa.js",
+    "wasm": "assets/fend_wasm_bg-BO_oxczj.wasm",
+    "sources": {
+      "engine/fend-core.patch": "dc45e37f926eb103982434d4efa8d916d86c6a430b735b6c7f832ed6d6c1014e",
+      "engine/worker-entry.js": "2a2a9a15f91d36dcf64966538fd8e4db44d25de1b27135d25a19a08661dbf1fd"
+    }
   }
 }

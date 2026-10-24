@@ -1,9 +1,10 @@
 {
 	"name": "fend-offline",
-	"version": "1.0.7",
+	"version": "1.0.8",
 	"private": true,
 	"description": "fend offline calculator — Android APK build via Capacitor",
 	"scripts": {
+		"engine:build": "node scripts/rebuild-engine.mjs",
 		"build:web": "node scripts/check-vendor.mjs && rm -rf www && mkdir -p www && cp index.html manifest.json sw.js icon-192.png icon-512.png icon-maskable-512.png exchange-rates.xml THIRD_PARTY_NOTICES.txt www/ && cp -r assets www/ && node scripts/patch-asset-paths.mjs www && node scripts/patch-rates.mjs www && node scripts/patch-runtime.mjs www && node scripts/version-assets.mjs www && node scripts/patch-sw.mjs www",
 		"vendor:check": "node scripts/check-vendor.mjs",
 		"vendor:audit": "node scripts/check-vendor.mjs --audit",

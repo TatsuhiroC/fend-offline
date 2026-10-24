@@ -12,6 +12,10 @@ export async function checkVendor(root = '.') {
 		const bytes = await readFile(resolve(root, name));
 		if (createHash('sha256').update(bytes).digest('hex') !== manifest.files[name]) throw new Error('Vendor hash mismatch: ' + name);
 	}
+	for (const [name, expected] of Object.entries(manifest.localEngine?.sources ?? {})) {
+		const bytes = await readFile(resolve(root, name));
+		if (createHash('sha256').update(bytes).digest('hex') !== expected) throw new Error('Engine source hash mismatch: ' + name);
+	}
 	const app = await readFile(resolve(root, actual.find(name => /\/App-.*\.js$/.test(name))), 'utf8');
 	for (const name of ['react', 'react-dom']) {
 		const component = manifest.components.find(component => component.name === name);
