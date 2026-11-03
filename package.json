@@ -13,9 +13,9 @@
 		"android:keystore": "bash scripts/make-keystore.sh"
 	},
 	"devDependencies": {
-		"@capacitor/android": "^8.5.3",
-		"@capacitor/assets": "^3.0.5",
-		"@capacitor/cli": "^8.5.3",
+		"@capacitor/android": "^8.6.0",
+		"@capacitor/assets": "^4.0.0",
+		"@capacitor/cli": "^8.6.0",
 		"@capacitor/core": "^8.5.3"
 	},
 	"engines": {
